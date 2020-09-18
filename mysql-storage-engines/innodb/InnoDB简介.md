@@ -46,6 +46,8 @@
 > | PERFORMANCE_SCHEMA |   YES   |                      Performance Schema                      |      NO      |  NO  |     NO     |
 > |     FEDERATED      |   NO    |                Federated MySQL storage engine                |     NULL     | NULL |    NULL    |
 
+> 或者可以查询 INFORMATION_SCHEMA.ENGINES表
+>
 > mysql> SELECT * FROM INFORMATION_SCHEMA.ENGINES;
 >
 > |       Engine       | Support |                           Comment                            | Transactions |  XA  | Savepoints |
