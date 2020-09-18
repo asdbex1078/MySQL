@@ -24,6 +24,43 @@
 1. 为每个表中查询最频繁的一列或几列指定一个主键，如果没有明显的主键，则指定一个**自动递增的值**。
 2. 使用join连接从多个表中根据相同的ID值提取数据时，为了提高连接性能，可以在连接列上定义`外键`，并在每个表中使用**相同的数据类型**声明这些列。**添加外键可以确保引用的列被索引**，这可以提高性能。外键还将**删除**或**更新**传播到所有受影响的表，并防止在父表中没有对应id的情况下在子表中插入数据。
 3. 关闭`自动提交`。每秒提交数百次会限制性能(受存储设备的写入速度限制)。
-4. 通过使用`START TRANSACTION`和`COMMIT`语句将相关的DML操作集分组到事务中。虽然您不希望过于频繁地提交，但也不希望发出大量的INSERT、UPDATE或DELETE语句，这些语句在没有提交的情况下运行数小时。
+4. 通过使用`START TRANSACTION`和`COMMIT`语句将相关的DML操作sql分组到事务中。不建议过于频繁地提交，也不建议发出一个批次中含有大量的INSERT、UPDATE或DELETE语句，这些语句可能运行几个小时。
+5. 不建议使用`LOCK TABLES` 语句。`InnoDB`可以同时处理对同一个表进行读写的多个会话，而无需牺牲可靠性或高性能。要获得对一组行的排他性写访问权限，请使用 [`SELECT ... FOR UPDATE`](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html)语法仅锁定要更新的行。
+6. 启用`innodb_file_per_table`选项，或者使用常规`表空间`将表的`数据`和`索引`放在**单独的文件**中，而不是`系统表空间`中。
+   默认情况下`innodb_file_per_table`选项是启用的。
+7. 评估您的数据和访问模式是否可以从`InnoDB`表或页面压缩功能中受益。您可以在`InnoDB`不牺牲读/写功能的情况下压缩表。
+8. 使用选项`sql_mode=NO_ENGINE_SUBSTITUTION`运行服务器，以防止在CREATE TABLE的engine =子句中指定的引擎出现问题时使用不同的存储引擎创建表。
 
-## 查看当前表的存储引擎
+## 查看当前库支持的存储引擎，以及默认的
+
+> mysql> SHOW ENGINES;
+>
+> +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+> | Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
+> +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+> | InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+> | MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+> | MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+> | BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+> | MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+> | CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+> | ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+> | PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+> | FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+> +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+
+> mysql> SELECT * FROM INFORMATION_SCHEMA.ENGINES;
+>
+> +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+> | Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
+> +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+> | InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+> | MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+> | MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+> | BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+> | MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+> | CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+> | ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+> | PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+> | FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+> +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
