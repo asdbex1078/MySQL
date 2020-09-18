@@ -4,9 +4,9 @@
 
 ## MySQL存储引擎
 
-### InnoDB
+### InnoDB简介
 
-[InnoDB简介]: https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/InnoDB%E7%AE%80%E4%BB%8B.md
+[InnoDB简介]: https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/InnoDB%E7%AE%80%E4%BB%8B.md	"简介"
 
 ##### 使用InnoDB的好处
 
