@@ -49,3 +49,10 @@
 
 ## 涉及MySQL其他
 
+> 参考文献：
+>
+> 1. [MySQL官方网站](https://dev.mysql.com/doc/refman/5.7/en/innodb-architecture.html)
+> 2. 阿里数据库月报
+>    - [InnoDB undo log漫游](http://mysql.taobao.org/monthly/2015/04/01/)
+> 3. 《高性能MySQL 第3版》
+> 4. 《MySQL技术内幕 InnoDB存储引擎》
