@@ -44,8 +44,28 @@
 
 > 参考文献：
 >
-> 1. [MySQL官方网站](https://dev.mysql.com/doc/refman/5.7/en/innodb-architecture.html)
+> 1. MySQL官方网站
+>
 > 2. 阿里数据库月报
+>    
 >    - [InnoDB undo log漫游](http://mysql.taobao.org/monthly/2015/04/01/)
+>    
 > 3. 《高性能MySQL 第3版》
+>
 > 4. 《MySQL技术内幕 InnoDB存储引擎》
+>
+> 5. 简书博客
+>
+>    - [MySQL中InnoDB引擎中页的概念](https://www.jianshu.com/p/e5e3f8a823c3)
+>    - 
+>
+> 6. CSDN博客
+>
+>    - [InnoDB引擎--存储结构与文件](https://blog.csdn.net/john_lw/article/details/80306122)
+>
+> 7. 其他博客
+>
+>    - [详解redo log 和 undo log](https://www.cnblogs.com/f-ck-need-u/p/9010872.html)
+>    - [MySQL中一条更新语句是如何执行的](https://www.cnblogs.com/wangchunli-blogs/p/10393139.html)
+>
+>    
