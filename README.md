@@ -6,37 +6,39 @@
 
 ### InnoDB
 
-1.  #### 从MySQL架构到InnoDB架构
+1. #### 从MySQL架构到InnoDB架构
 
    1. [MySQL架构](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#mysql%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84)
 
    2. [InnoDB架构](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#innodb)
 
    3. [InnoDB的多线程模型](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#innodb%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B)
-- [Master Thread](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#master-thread---%E6%A0%B8%E5%BF%83%E7%BA%BF%E7%A8%8B)
-  
-- [IO Thread](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#io-thread)
-  
-- [Purge Thread](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#purge-thread)
-  
-- [Page Cleaner Thread](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#page-cleaner-thread)
-4. InnoDB简介
 
-5. InnoDB关键特性
-   
+      - [Master Thread](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#master-thread---%E6%A0%B8%E5%BF%83%E7%BA%BF%E7%A8%8B)
+
+      - [IO Thread](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#io-thread)
+
+      - [Purge Thread](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#purge-thread)
+
+      - [Page Cleaner Thread](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#page-cleaner-thread)
+
+2. InnoDB简介
+
+3. InnoDB关键特性
+
    - [Insert Buffer——插入缓冲区](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.1.1.InnoDB%E2%80%94%E2%80%94%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7.md#insert-buffer---%E6%8F%92%E5%85%A5%E7%BC%93%E5%86%B2)
-   
+
    - [Double Write Buffer——双写缓冲区](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.1.1.InnoDB%E2%80%94%E2%80%94%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7.md#double-write---%E4%B8%A4%E6%AC%A1%E5%86%99)
-   
+
    - [Adaptive Hash Index——自适应哈希索引](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.1.1.InnoDB%E2%80%94%E2%80%94%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7.md#adaptive-hash-index---%E8%87%AA%E9%80%82%E5%BA%94%E5%93%88%E5%B8%8C%E7%B4%A2%E5%BC%95)
-   
+
    - [AIO——异步IO]()
-   
+
    - [刷新临近页](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.1.1.InnoDB%E2%80%94%E2%80%94%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7.md#%E5%88%B7%E6%96%B0%E4%B8%B4%E8%BF%91%E9%A1%B5)
-   
+
    - [预读](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.1.1.InnoDB%E2%80%94%E2%80%94%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7.md#%E9%A2%84%E8%AF%BB)
-   
-6. #### InnoDB内存结构
+
+4. #### InnoDB内存结构
 
    1. [缓冲池 - Buffer Pool](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.2.0.InnoDB%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E7%BC%93%E5%86%B2%E6%B1%A0.md#%E7%BC%93%E5%86%B2%E6%B1%A0)
       - 为什么会出现
@@ -68,7 +70,7 @@
       - 其他信息
    4. [额外内存池](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.2.3.InnoDB%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E9%A2%9D%E5%A4%96%E5%86%85%E5%AD%98%E6%B1%A0.md)
 
-7. #### InnoDB磁盘结构
+5. #### InnoDB磁盘结构
 
    1. [页逻辑存储结构](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.3.0.InnoDB%E7%A3%81%E7%9B%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84.md#innodb%E9%A1%B5%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
       - 页的结构
@@ -95,7 +97,7 @@
       - 临时表空间
    5. [数据字典 - Data Dictionary]()
 
-8. #### MySQL文件
+6. #### MySQL文件
 
    1. [参数文件](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.4.0.Mysql%E6%96%87%E4%BB%B6%E2%80%94%E2%80%94%E5%8F%82%E6%95%B0%E6%96%87%E4%BB%B6.md#%E5%8F%82%E6%95%B0%E6%96%87%E4%BB%B6)
       - 作用
@@ -155,7 +157,7 @@
    10. [bin log 和 redo log 的区别](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.4.6.Mysql%E6%96%87%E4%BB%B6%E2%80%94%E2%80%94bin%20log%E5%92%8Credo%20log%E7%9A%84%E5%8C%BA%E5%88%AB.md#%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6-%E5%92%8C-%E9%87%8D%E5%81%9A%E6%97%A5%E5%BF%97-%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8C%BA%E5%88%AB)
    11. [bin log、redo log、undo log写入顺序 - 案例](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.4.8.Mysql%E6%96%87%E4%BB%B6%E2%80%94%E2%80%94bin%20log%E3%80%81redo%20log%E3%80%81undo%20log%E5%86%99%E5%85%A5%E9%A1%BA%E5%BA%8F-%E6%A1%88%E4%BE%8B.md#%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90---bin-logredo-logundo-log%E5%86%99%E5%85%A5%E9%A1%BA%E5%BA%8F)
 
-9. #### InnoDB锁
+7. #### InnoDB锁
 
    1. [latch - 线程锁](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.5.0.InnoDB%E9%94%81%E2%80%94%E2%80%94latch.md#latch---%E7%BA%BF%E7%A8%8B%E9%94%81)
       - 简介
@@ -196,40 +198,51 @@
       - 禁用死锁检测
       - 如何避免死锁
 
-10. #### InnoDB事务
+8. #### InnoDB事务
 
-   1. [事务概念及分类](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.0.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E6%A6%82%E5%BF%B5%E5%8F%8A%E5%88%86%E7%B1%BB.md#%E6%A6%82%E5%BF%B5)
-      - 概念
-      - 分类
-        - 扁平事务
-        - 带有保存点的扁平事务
-        - 链事务
-        - 嵌套事务
-        - 分布式事务
-   2. [一些前提知识点](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.1.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AF%86%E7%82%B9.md#%E4%B8%80%E4%BA%9B%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AF%86)
-      - 自动提交、提交和回滚
-      - 将 DML 操作与事务分组
-      - 一致性非锁定读 - read view / snapshot
-      - 锁定读
-      - 幻影行
-   3. [事务的状态](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.2.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%8A%B6%E6%80%81.md#%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%8A%B6%E6%80%81)
-   4. [事务的隔离级别](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.3.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB.md#%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB)
-   5. [事务的特性](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.4.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%89%B9%E6%80%A7.md#%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%89%B9%E6%80%A7)
-   6. [事务实现的基础](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.5.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%9F%BA%E7%A1%80.md#%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%9F%BA%E7%A1%80)
-      - redo log
-      - undo log
-   7. [事务的实现](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.6.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%9A%84%E5%AE%9E%E7%8E%B0.md#%E4%BA%8B%E5%8A%A1%E7%9A%84%E5%AE%9E%E7%8E%B0)
-   8. [多版本并发控制](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.7.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6.md#%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6---mvcc)
-      - 简介
-      - snapshot - 快照 与 read view
-      - MVCC快照读案例
-      - MVCC的快照读 与 当前读的例子
-      - MVCC有没有解决幻读的问题
-      - MVCC对聚簇索引和二级索引处理方式的区别
-   9. 分布式事务
-      - [XA](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.8.0.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E4%B9%8BXA.md#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88)
+   - [事务概念及分类](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.0.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E6%A6%82%E5%BF%B5%E5%8F%8A%E5%88%86%E7%B1%BB.md#%E6%A6%82%E5%BF%B5)
+     - 扁平事务
+     - 带有保存点的扁平事务
+     - 链事务
+     - 嵌套事务
+     - 分布式事务
 
-11. #### 其他知识点
+   - [一些前提知识点](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.1.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AF%86%E7%82%B9.md#%E4%B8%80%E4%BA%9B%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AF%86)
+
+     - 自动提交、提交和回滚
+
+     - 将 DML 操作与事务分组
+
+     - 一致性非锁定读 - read view / snapshot
+
+     - 锁定读
+
+     - 幻影行
+
+   - [事务的状态](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.2.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%8A%B6%E6%80%81.md#%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%8A%B6%E6%80%81)
+
+   - [事务的隔离级别](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.3.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB.md#%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB)
+
+   - [事务的特性](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.4.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%89%B9%E6%80%A7.md#%E4%BA%8B%E5%8A%A1%E7%9A%84%E7%89%B9%E6%80%A7)
+
+   - [事务实现的基础](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.5.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%9F%BA%E7%A1%80.md#%E4%BA%8B%E5%8A%A1%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%9F%BA%E7%A1%80)
+     - redo log
+     - undo log
+
+   - [事务的实现](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.6.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E4%BA%8B%E5%8A%A1%E7%9A%84%E5%AE%9E%E7%8E%B0.md#%E4%BA%8B%E5%8A%A1%E7%9A%84%E5%AE%9E%E7%8E%B0)
+
+   - [多版本并发控制](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.7.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6.md#%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6---mvcc)
+     - 简介
+     - snapshot - 快照 与 read view
+     - MVCC快照读案例
+     - MVCC的快照读 与 当前读的例子
+     - MVCC有没有解决幻读的问题
+     - MVCC对聚簇索引和二级索引处理方式的区别
+
+   - 分布式事务
+     - [XA](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.6.8.0.InnoDB%E4%BA%8B%E5%8A%A1%E2%80%94%E2%80%94%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E4%B9%8BXA.md#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88)
+
+9. #### 其他知识点
 
 ### MYISAM
 
