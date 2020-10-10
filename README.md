@@ -2,6 +2,10 @@
 
 ## MySQL优化
 
+暂时先放个脑图，后期会不断完善。。。
+
+![MYSQL(5.7含部分8.0新特性).png](C:\Users\86176\Desktop\笔记\PDF\导图\MYSQL\MYSQL(5.7含部分8.0新特性).png)
+
 ## MySQL存储引擎
 
 ### InnoDB
@@ -263,18 +267,17 @@
 >    - [MySQL · 引擎特性 · Latch 持有分析](http://mysql.taobao.org/monthly/2020/03/07/)
 >    - [MySQL · 引擎特性 · InnoDB 数据文件简述](http://mysql.taobao.org/monthly/2020/08/06/)
 >    
->3. 阿里云开发者社区
-> 
->   - [InnoDB的read view，回滚段和purge过程简介](https://developer.aliyun.com/article/560506)
-> 
->4. 《高性能MySQL 第3版》
-> 
->5. 《MySQL技术内幕 InnoDB存储引擎》
-> 
->6. 简书博客
-> 
+> 3. 阿里云开发者社区
+>
+>    - [InnoDB的read view，回滚段和purge过程简介](https://developer.aliyun.com/article/560506)
+> 4. 《高性能MySQL 第3版》
+>
+> 5. 《MySQL技术内幕 InnoDB存储引擎》
+>
+> 6. 简书博客
+>
 >    - [MySQL中InnoDB引擎中页的概念](https://www.jianshu.com/p/e5e3f8a823c3)
->   
+>
 > 7. CSDN博客
 >
 >    - [InnoDB引擎--存储结构与文件](https://blog.csdn.net/john_lw/article/details/80306122)
@@ -293,7 +296,6 @@
 >    - [详解redo log 和 undo log](https://www.cnblogs.com/f-ck-need-u/p/9010872.html)
 >    - [MySQL中一条更新语句是如何执行的](https://www.cnblogs.com/wangchunli-blogs/p/10393139.html)
 >    - [InnoDB存储引擎关键特性](https://www.it610.com/article/5037373.htm)
->
 
 
 
