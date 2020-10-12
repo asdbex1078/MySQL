@@ -1,0 +1,51 @@
+{
+  "steps": [														/* 步骤 */
+    {
+      "join_preparation": { 										/* 查询准备阶段 */
+        "select#": 1,												/* 表示第一个select */
+        "steps": [
+          {
+            "expanded_query": "/* select#1 */ select count(1) AS `count(1)` from `user1` where (1 = 0)"  /* 原始SQL语句 */
+          }
+        ] /* steps */
+      } /* join_preparation */
+    },
+    {
+      "join_optimization": { 										/* 查询优化阶段 */
+        "select#": 1,												/* 表示第一个select */
+        "steps": [
+          {
+            "condition_processing": { 								/* 条件处理 */
+              "condition": "WHERE",									/* 对 WHERE 条件进行处理 */
+              "original_condition": "(1 = 0)",						/* 完整的 WHERE 条件会在这里显示 */
+              "steps": [	
+                {
+                  "transformation": "equality_propagation",			/* 第一步，等值条件句转换 */
+                  "resulting_condition": "(1 = 0)"			
+                },
+                {
+                  "transformation": "constant_propagation",			/* 第二步，常量条件句转换 */
+                  "resulting_condition": "(1 = 0)"
+                },
+                {
+                  "transformation": "trivial_condition_removal",	/* 第三步，无效条件移除的转换 */
+                  "resulting_condition": null						/* 可以看到，where 条件被改为 null */
+                }
+              ] /* steps */
+            } /* condition_processing */
+          }
+        ] /* steps */,
+        "empty_result": {											/* 结果为空 */
+          "cause": "Impossible WHERE"								/* 原因：不可能的 WHERE 条件*/
+        } /* empty_result */
+      } /* join_optimization */
+    },
+    {
+      "join_execution": {											/* 执行阶段 */
+        "select#": 1,												/* 编号为1的SQL语句 */
+        "steps": [													/* 步骤为空，不执行改SQL */
+        ] /* steps */
+      } /* join_execution */
+    }
+  ] /* steps */
+}
