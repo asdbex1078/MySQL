@@ -10,6 +10,8 @@
 
 ## MySQL存储引擎
 
+![innoDB概览](InnoDB.png)
+
 ### InnoDB
 
 1. #### 从MySQL架构到InnoDB架构
