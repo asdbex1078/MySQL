@@ -303,9 +303,7 @@
 >    - [MySQL中一条更新语句是如何执行的](https://www.cnblogs.com/wangchunli-blogs/p/10393139.html)
 >    - [InnoDB存储引擎关键特性](https://www.it610.com/article/5037373.htm)
 
-
-
-
+---
 
 > 本文一些知识点未深入研究，链接摘录如下，感兴趣可以继续研究。
 >
@@ -314,3 +312,12 @@
 > 1. [MySQL · 内核分析 · InnoDB mutex 实现分析](http://mysql.taobao.org/monthly/2020/03/05/)
 > 2. [MySQL · 内核特性 · InnoDB btree latch 优化历程](http://mysql.taobao.org/monthly/2020/06/02/)
 > 3. [MySQL · 引擎特性 · InnoDB UNDO LOG写入 - 源码分析](http://mysql.taobao.org/monthly/2020/08/05/)
+
+---
+
+> 关于本文文件结构如下
+>
+> - mysql-image : 所有图片都会保存到这里，根据 .md 文件的排序命名
+> - mysql-optimization : MySQL优化的相关总结
+> - mysql-others : MySQL其他，包含所有脑图
+> - mysql-storage-engines : MySQL中的存储引擎，如 InnoDB 、MYISAM等
