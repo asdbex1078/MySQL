@@ -5,8 +5,10 @@
 
    ![MySQL架构图](../mysql-image/1.0.1.MySQL架构图.jpg)
 
-   图示一条SQL大概执行流程，来源于《高性能MySQL 第3版》
+   
 
+   图示一条SQL大概执行流程，来源于《高性能MySQL 第3版》
+   
    ![1.0.5.查询sql大概执行流程](../mysql-image/1.0.5.查询sql大概执行流程.png)
    
    1. 客户端发送一条查询给服务器
@@ -15,7 +17,7 @@
    4. MySQL根据优化器生成的执行计划，调用存储引擎的API执行查询
    5. 将结果返回给客户端
    
-   更多详细介绍，参照这篇文章：[MySQL架构及组成介绍](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#mysql%E6%9E%B6%E6%9E%84%E5%8F%8A%E7%BB%84%E6%88%90%E4%BB%8B%E7%BB%8D)
+   更多详细介绍，参照这篇文章：[MySQL架构及组成介绍](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#mysql%E6%9E%B6%E6%9E%84%E5%8F%8A%E7%BB%84%E6%88%90%E4%BB%8B%E7%BB%8D)
    
 2. 
 
