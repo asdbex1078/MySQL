@@ -1,25 +1,25 @@
 # (一）架构问题
 
-1. 谈一下MYSQL架构，都由哪些组成？一条SQL大概的执行流程是什么？
-   首先看看MySQL架构图：
+## 1.谈一下MYSQL架构，都由哪些组成？一条SQL大概的执行流程是什么？
+首先看看MySQL架构图：
 
-   ![MySQL架构图](../mysql-image/1.0.1.MySQL架构图.jpg)
+![MySQL架构图](../mysql-image/1.0.1.MySQL架构图.jpg)
 
-   
 
-   图示一条SQL大概执行流程，来源于《高性能MySQL 第3版》
-   
-   ![1.0.5.查询sql大概执行流程](../mysql-image/1.0.5.查询sql大概执行流程.png)
-   
-   1. 客户端发送一条查询给服务器
-   2. 服务器先检查查询缓存，如果命中了缓存，则立刻返回存储在缓存中的结果。否则进入下一阶段
-   3. 服务器端进行SQL解析、预处理，再由优化器生成对应的执行计划。
-   4. MySQL根据优化器生成的执行计划，调用存储引擎的API执行查询
-   5. 将结果返回给客户端
-   
-   更多详细介绍，参照这篇文章：[MySQL架构及组成介绍](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#mysql%E6%9E%B6%E6%9E%84%E5%8F%8A%E7%BB%84%E6%88%90%E4%BB%8B%E7%BB%8D)
-   
-2. 
+
+图示一条SQL大概执行流程，来源于《高性能MySQL 第3版》
+
+![1.0.5.查询sql大概执行流程](../mysql-image/1.0.5.查询sql大概执行流程.png)
+
+1. 客户端发送一条查询给服务器
+2. 服务器先检查查询缓存，如果命中了缓存，则立刻返回存储在缓存中的结果。否则进入下一阶段
+3. 服务器端进行SQL解析、预处理，再由优化器生成对应的执行计划。
+4. MySQL根据优化器生成的执行计划，调用存储引擎的API执行查询
+5. 将结果返回给客户端
+
+更多详细介绍，参照这篇文章：[MySQL架构及组成介绍](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#mysql%E6%9E%B6%E6%9E%84%E5%8F%8A%E7%BB%84%E6%88%90%E4%BB%8B%E7%BB%8D)
+
+
 
 # (二）schema问题
 
