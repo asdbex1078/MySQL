@@ -312,6 +312,7 @@
 > 1. [MySQL · 内核分析 · InnoDB mutex 实现分析](http://mysql.taobao.org/monthly/2020/03/05/)
 > 2. [MySQL · 内核特性 · InnoDB btree latch 优化历程](http://mysql.taobao.org/monthly/2020/06/02/)
 > 3. [MySQL · 引擎特性 · InnoDB UNDO LOG写入 - 源码分析](http://mysql.taobao.org/monthly/2020/08/05/)
+> 4. [MySQL · 源码阅读 · InnoDB伙伴内存分配系统实现分析](http://mysql.taobao.org/monthly/2020/09/04/)
 
 ---
 

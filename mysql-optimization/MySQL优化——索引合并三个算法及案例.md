@@ -6,21 +6,20 @@
 默认情况下，所有这些标志都是打开的。若只启用某些算法，请将index_merge设置为off，并仅启用应该允许的其他算法。
 (例如，查询optimizer_switch变量结果：
 	mysql> show VARIABLES like 'optimizer_switch';
-	+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-	| Variable_name    | Value                                                                                                                                                                                                                                                                                                                                                                                                            |
-	+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-	| optimizer_switch | index_merge=on,index_merge_union=on,index_merge_sort_union=on,index_merge_intersection=on,engine_condition_pushdown=on,index_condition_pushdown=on,mrr=on,mrr_cost_based=on,block_nested_loop=on,batched_key_access=off,materialization=on,semijoin=on,loosescan=on,firstmatch=on,duplicateweedout=on,subquery_materialization_cost_based=on,use_index_extensions=on,condition_fanout_filter=on,derived_merge=on |
-	+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-	1 row in set, 1 warning (0.00 sec)
-)
+
+|  Variable_name   |                            Value                             |
+| :--------------: | :----------------------------------------------------------: |
+| optimizer_switch | index_merge=on,index_merge_union=on,index_merge_sort_union=on,index_merge_intersection=on,<br />engine_condition_pushdown=on,index_condition_pushdown=on,mrr=on,mrr_cost_based=on,<br />block_nested_loop=on,batched_key_access=off,materialization=on,semijoin=on,loosescan=on,<br />firstmatch=on,duplicateweedout=on,subquery_materialization_cost_based=on,use_index_extensions=on,<br />condition_fanout_filter=on,derived_merge=on |
+
+
 
 一、索引合并交集 (Extra中显示 ：Using intersect)     重点：  ----- AND 条件
 
 	当一个WHERE子句与AND组合在一起被转换为多个范围条件时，此访问算法适用，并且每个条件是下列条件之一：
 	(表示使用and的各个索引的条件时，该信息表示是从处理结果获取交集)
-
+	
 		1、这种形式的N部分表达式，其中索引正好有N个部分（即覆盖所有索引部分）：
-
+	
 			key_part1 = const1 AND key_part2 = const2 ... AND key_partN = constN
 			(需满足特殊条件——索引合并成本 < 单列索引成本。后期会讨论)
 		
@@ -51,7 +50,7 @@
 			
 			②、SELECT * FROM tbl_name
 				WHERE key1_part1 = 1 AND key1_part2 = 2 AND key2 = 2;
-
+	
 				（覆盖索引 + 另一个索引的组合。考虑一下为什么要加 force index，成本问题）
 				（	
 					mysql> explain select user_province,user_age from user1 force index(idx_user_age,idx_province) where user_province = '山西省' and user_city = '沧州市' AND user_area = '汤旺河区' AND user_age = 31;
@@ -65,7 +64,7 @@
 				
 	如果所使用的索引没有复盖查询中使用的所有列，则只有在满足所有使用key的范围条件时，才会检索完整的行。
 	（即，最终需要返回的列，不在索引中，就需要回表查询完整的行信息。）
-
+	
 	如果合并条件之一是InnoDB表的主键上的条件，则该条件不用于行检索，而是用于筛选使用其他条件检索的行。
 	（可见上边2中①，主键并不是用来检索完整的行信息的，而是过滤不用的行。）
 
@@ -73,10 +72,10 @@
 	
 	此算法的标准是类似的指数合并交算法。该算法适用于将表的WHERE子句与OR组合在一起的不同键上转换为多个范围条件的情况，并且每个条件是下列条件之一：
 	(表示使用or连接各个使用索引的条件时，该信息表示从处理结果获取并集)
-
+	
 	1、这种形式的N部分表达式，其中索引正好有N个部分（即覆盖所有索引部分）：
 	(同一中的1，只不过这个地方的条件是or，官网是错的)
-
+	
 	(
 		mysql> explain select * from user1 where user_province = '山西省' or user_age = 31;
 		+----+-------------+-------+------------+-------------+--------------------------------------------------+---------------------------+---------+------+-------+----------+-----------------------------------------------------+

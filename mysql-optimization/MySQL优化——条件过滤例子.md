@@ -1,25 +1,29 @@
 考虑以下查询：
-	SELECT *
+
+```sql
+SELECT *
 	  FROM employee JOIN department ON employee.dept_no = department.dept_no
-	  WHERE employee.first_name = 'John'
-	  AND employee.hire_date BETWEEN '2018-01-01' AND '2018-06-01';
-	  
+WHERE employee.first_name = 'John'
+AND employee.hire_date BETWEEN '2018-01-01' AND '2018-06-01';
+```
+
+
 假设数据集具有以下特征：
 
 	该employee表有1024行。
-
+	
 	该department表有12行。
-
+	
 	两个表在上都有一个索引dept_no。
-
+	
 	该employee表的索引为 first_name。
-
+	
 	有8行满足以下条件 employee.first_name：
 		employee.first_name = 'John'
-
+	
 	150行满足以下条件 employee.hire_date：
 		employee.hire_date BETWEEN '2018-01-01' AND '2018-06-01'
-
+	
 	1行满足以下两个条件：
 		employee.first_name = 'John'
 		AND employee.hire_date BETWEEN '2018-01-01' AND '2018-06-01'

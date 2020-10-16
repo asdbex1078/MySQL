@@ -1,48 +1,62 @@
-EXPLAIN SELECT tt.TicketNumber, tt.TimeIn,
-               tt.ProjectReference, tt.EstimatedShipDate,
-               tt.ActualShipDate, tt.ClientID,
-               tt.ServiceCodes, tt.RepetitiveID,
-               tt.CurrentProcess, tt.CurrentDPPerson,
-               tt.RecordVolume, tt.DPPrinted, et.COUNTRY,
-               et_1.COUNTRY, do.CUSTNAME
-        FROM tt, et, et AS et_1, do
-        WHERE tt.SubmitTime IS NULL
-          AND tt.ActualPC = et.EMPLOYID
-          AND tt.AssignedPC = et_1.EMPLOYID
-          AND tt.ClientID = do.CUSTNMBR;
-		  
+```sql
+EXPLAIN SELECT 
+tt.TicketNumber, tt.TimeIn,
+tt.ProjectReference, tt.EstimatedShipDate,
+tt.ActualShipDate, tt.ClientID,
+tt.ServiceCodes, tt.RepetitiveID,
+tt.CurrentProcess, tt.CurrentDPPerson,
+tt.RecordVolume, tt.DPPrinted, et.COUNTRY,
+et_1.COUNTRY, do.CUSTNAME
+FROM tt, et, et AS et_1, do
+WHERE tt.SubmitTime IS NULL
+AND tt.ActualPC = et.EMPLOYID
+AND tt.AssignedPC = et_1.EMPLOYID
+AND tt.ClientID = do.CUSTNMBR;
+```
+
 前提条件：
 	1、表中列的类型及大小
-		表	列			数据类型
-		tt	ActualPC	CHAR(10)
-		tt	AssignedPC	CHAR(10)
-		tt	ClientID	CHAR(10)
-		et	EMPLOYID	CHAR(15)
-		do	CUSTNMBR	CHAR(15)
-	2、表中的索引如下：
-		tt	ActualPC
-		tt	AssignedPC
-		tt	ClientID
-		et	EMPLOYID （PRIMARY KEY）
-		do	CUSTNMBR （PRIMARY KEY）
-	3、tt.ActualPC值不是均匀分布的 （不是逐渐递增的，可能会导致索引树结构不是最优）
-	
+
+|  表  |     列     | 数据类型 |
+| :--: | :--------: | :------: |
+|  tt  |  ActualPC  | CHAR(10) |
+|  tt  | AssignedPC | CHAR(10) |
+|  tt  |  ClientID  | CHAR(10) |
+|  et  |  EMPLOYID  | CHAR(15) |
+|  do  |  CUSTNMBR  | CHAR(15) |
+
+
+​	2、表中的索引如下：
+
+|  tt  |         ActualPC         |
+| :--: | :----------------------: |
+|  tt  |        AssignedPC        |
+|  tt  |         ClientID         |
+|  et  | EMPLOYID （PRIMARY KEY） |
+|  do  | CUSTNMBR （PRIMARY KEY） |
+
+
+​	3、tt.ActualPC值不是均匀分布的 （不是逐渐递增的，可能会导致索引树结构不是最优）
+​	
 优化过程：
 
 1、最初的explain信息：
-	table type possible_keys key  key_len ref  rows  	Extra
-	et    ALL  PRIMARY       NULL NULL    NULL 74
-	do    ALL  PRIMARY       NULL NULL    NULL 2135
-	et_1  ALL  PRIMARY       NULL NULL    NULL 74
-	tt    ALL  AssignedPC,   NULL NULL    NULL 3872      Range checked for each record (index map: 0x23)
-			   ClientID,
-			   ActualPC
-	
-	因为type是 ALL针对每个表的，所以此输出表明MySQL正在生成所有表的笛卡尔积；也就是说，每行的组合。这需要相当长的时间，
-	因为必须检查每个表中的行数的乘积。对于目前的情况，此乘积为74×2135×74×3872 = 45,268,558,720行。如果表更大，您只能想象需要多长时间。
 
-	这里的一个问题是，如果将索引声明为相同的类型和大小，MySQL可以更有效地在列上使用索引。在这种情况下，如果VARCHAR与 CHAR被声明为相同的大小，
-	则他们被认为是相同的。 tt.ActualPC 声明为 CHAR(10)和et.EMPLOYID 是CHAR(15)，因此长度不匹配。
+| table | type |                possible_keys                 | key  | key_len | ref  | rows |                      Extra                      |
+| :---: | :--: | :------------------------------------------: | :--: | :-----: | :--: | :--: | :---------------------------------------------: |
+|  et   | ALL  |                   PRIMARY                    | NULL |  NULL   | NULL |  74  |                                                 |
+|  do   | ALL  |                   PRIMARY                    | NULL |  NULL   | NULL | 2135 |                                                 |
+| et_1  | ALL  |                   PRIMARY                    | NULL |  NULL   | NULL |  74  |                                                 |
+|  tt   | ALL  | AssignedPC<br />ClientID<br /><br />ActualPC | NULL |  NULL   | NULL | 3872 | Range checked for each record (index map: 0x23) |
+
+
+​	
+
+> 因为type是 ALL针对每个表的，所以此输出表明MySQL正在生成所有表的笛卡尔积；也就是说，每行的组合。这需要相当长的时间，
+> 因为必须检查每个表中的行数的乘积。对于目前的情况，此乘积为74×2135×74×3872 = 45,268,558,720行。如果表更大，您只能想象需要多长时间。
+>
+> 这里的一个问题是，如果将索引声明为相同的类型和大小，MySQL可以更有效地在列上使用索引。在这种情况下，如果VARCHAR与 CHAR被声明为相同的大小，
+> 则他们被认为是相同的。 tt.ActualPC 声明为 CHAR(10)和et.EMPLOYID 是CHAR(15)，因此长度不匹配。
 
 2、若要解决此列长度之间的差异，请使用 从10个字符ALTER TABLE延长 ActualPC到15个字符：
 	mysql> ALTER TABLE tt MODIFY ActualPC VARCHAR(15);
@@ -59,7 +73,7 @@ EXPLAIN SELECT tt.TicketNumber, tt.TimeIn,
 	et    eq_ref PRIMARY       PRIMARY 15      tt.ActualPC 1
 	
 	可以看到，rows相乘的结果，少了74倍
-	
+
 3、重复第二步更改以消除tt.AssignedPC = et_1.EMPLOYID和tt.ClientID = do.CUSTNMBR比较的列长不匹配：
 	mysql> ALTER TABLE tt MODIFY AssignedPC VARCHAR(15),
 						  MODIFY ClientID   VARCHAR(15);
@@ -73,7 +87,7 @@ EXPLAIN SELECT tt.TicketNumber, tt.TimeIn,
 	et_1  eq_ref PRIMARY       PRIMARY  15      tt.AssignedPC 1
 	do    eq_ref PRIMARY       PRIMARY  15      tt.ClientID   1
 	可以看到，rows结果少了 N 倍。74x52=3848
-	
+
 4、MySQL假定tt.ActualPC 列中的值是均匀分布的，导致索引树不是最优，估计行数时，会有一些差异
 	使用以下语句，重新编排索引树	
 		mysql> ANALYZE TABLE tt;	

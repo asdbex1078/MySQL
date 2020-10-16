@@ -3,18 +3,22 @@
 不能被其他会话在DDL语句中使用，直到事务结束。
 
 该原理不仅适用于事务表，而且还适用于非事务表。假设会话开始使用事务表t和非事务表的 事务 nt，如下所示：
+
 	START TRANSACTION;
 	SELECT * FROM t;
-	SELECT * FROM nt;
-	
+	SELECT * FROM nt;	
 服务器同时持有t和nt上的元数据锁，直到事务结束。如果另一个会话尝试在任何一个表上执行DDL或写锁操作，它会阻塞直到在事务结束时释放元数据锁。
 例如，第二个会话如果尝试以下任何操作就会阻塞:
-	DROP TABLE t;
+
+```
+DROP TABLE t;
 	ALTER TABLE t ...;
 	DROP TABLE nt;
 	ALTER TABLE nt ...;
 	LOCK TABLE t ... WRITE;
-	
+```
+
+
 同样的行为也适用于LOCK TABLES ... READ。也就是说，显式或隐式启动的更新任何表(事务性或非事务性)的事务将阻塞，并被锁表LOCK TABLES ... READ。
 
 如果服务器为语法有效但在执行期间失败的语句获取元数据锁，那么它不会提前释放锁。锁释放仍然延迟到事务的末尾，因为失败的语句被写入二进制日志，

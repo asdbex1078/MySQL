@@ -1,25 +1,31 @@
 例如：user1表：
-	CREATE TABLE `user1` (
-	  `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
-	  `user_name` varchar(100) DEFAULT NULL COMMENT '用户名',
-	  `user_age` tinyint(3) DEFAULT NULL COMMENT '用户年龄',
-	  `user_password` varchar(100) DEFAULT NULL COMMENT '用户密码',
-	  `user_sex` tinyint(1) DEFAULT NULL COMMENT '性别 1-男，0-女',
-	  `user_province` varchar(32) DEFAULT NULL COMMENT '用户所在省',
-	  `user_city` varchar(32) DEFAULT NULL COMMENT '用户所在城市',
-	  `user_area` varchar(32) DEFAULT NULL COMMENT '用户所在区',
-	  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-	  `modified_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-	  PRIMARY KEY (`user_id`),
-	  KEY `idx_user_name` (`user_name`),
-	  KEY `idx_user_age` (`user_age`),
-	  KEY `idx_province_city_area` (`user_province`,`user_city`,`user_area`),
-	  KEY `idx_sex_province_city_area` (`user_sex`,`user_province`,`user_city`,`user_area`),
-	  KEY `idx_sex` (`user_sex`)
+
+```sql
+CREATE TABLE user1 (
+	  user_id int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+	  user_name varchar(100) DEFAULT NULL COMMENT '用户名',
+	  user_age tinyint(3) DEFAULT NULL COMMENT '用户年龄',
+	  user_password varchar(100) DEFAULT NULL COMMENT '用户密码',
+	  user_sex tinyint(1) DEFAULT NULL COMMENT '性别 1-男，0-女',
+	  user_province varchar(32) DEFAULT NULL COMMENT '用户所在省',
+	  user_city varchar(32) DEFAULT NULL COMMENT '用户所在城市',
+	  user_area varchar(32) DEFAULT NULL COMMENT '用户所在区',
+	  create_time datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+	  modified_time datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+	  PRIMARY KEY (user_id),
+	  KEY idx_user_name (user_name),
+	  KEY idx_user_age (user_age),
+	  KEY idx_province_city_area (user_province,user_city,user_area),
+	  KEY idx_sex_province_city_area (user_sex,user_province,user_city,user_area),
+	  KEY idx_sex (user_sex)
 	) ENGINE=InnoDB AUTO_INCREMENT=223793 DEFAULT CHARSET=utf8;
-		
+```
+
+
+
+
 测试sql：
-	explain select * from user1 where user_province = '山西省' and user_city like '%原%'  and create_time = '2020-08-18 15:45:08';
+	`explain select * from user1 where user_province = '山西省' and user_city like '%原%'  and create_time = '2020-08-18 15:45:08';`
 	
 表中数据摘要：
 	+---------+-----------+----------+----------------------------------+----------+---------------+-----------+-----------+---------------------+---------------------+
@@ -55,9 +61,9 @@ MySQL5.5中：
 	1 row in set, 1 warning (0.00 sec)
 	
 解释：
-	没有ICP：MySQL可以使用索引扫描省份 user_province = '山西省'。第二部分（user_city like '%原%'）不能用于限制必须扫描的行数，因为他不能走索引。
-	因此，此查询必须为所有具有的"山西省"检索完整的表行。即把所有"山西省"的数据推送到MySQL服务器，然后MySQL服务器过滤出 user_city like '%原%'的数据.（Using where）
 
+		没有ICP：MySQL可以使用索引扫描省份 user_province = '山西省'。第二部分（user_city like '%原%'）不能用于限制必须扫描的行数，因为他不能走索引。
+		因此，此查询必须为所有具有的"山西省"检索完整的表行。即把所有"山西省"的数据推送到MySQL服务器，然后MySQL服务器过滤出 user_city like '%原%'的数据.（Using where）
 		(
 			1、在索引 idx_province_city_area 中(非聚簇索引)，找到所有山西省的主键 user_id： 27679、38374、67703、69102、75910、92244、121410。
 			2、循环遍历主键 user_id 去主表中，查出对应的完整数据行。(非聚簇索引查询数据的过程)。每获取到的一行完整数据，推送到MySQL服务器，
@@ -66,9 +72,8 @@ MySQL5.5中：
 		)
 
 
-	有ICP：首先根据索引查到所有 user_province = '山西省'，然后虽然 user_city 不走索引，但是索引中包含了该值，完全可以过滤出包含 “原”的数据。
+		有ICP：首先根据索引查到所有 user_province = '山西省'，然后虽然 user_city 不走索引，但是索引中包含了该值，完全可以过滤出包含 “原”的数据。
 			此过程，过滤掉了没有"原"的数据。推送到服务器的数据行更少，更符合条件。(Using index condition)
-			
 		(
 			1、在索引 idx_province_city_area 中(非聚簇索引)，找到所有山西省的主键 user_id：27679、38374、67703、69102、75910、92244、121410。
 			2、在索引中过滤，去掉 user_city 中，不满足 like '%原%' 的数据 主键 user_id，此时，主键 user_id 剩下 27679、38374、69102、92244

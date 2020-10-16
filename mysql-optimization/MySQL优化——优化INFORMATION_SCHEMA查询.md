@@ -3,30 +3,33 @@
 你可以利用这一原则如下:
 
 	要查找数据库或表，请使用计算为常量的表达式，例如字面值、返回常量的函数或标量子查询。
-
-	避免使用非常量数据库名称查找值(或不使用查找值)的查询，因为它们需要扫描数据目录以查找匹配的数据库目录名称。
-
-	在数据库中，避免使用非常表名查找值(或不使用查找值)的查询，因为它们需要扫描数据库目录以找到匹配的表文件。
 	
+	避免使用非常量数据库名称查找值(或不使用查找值)的查询，因为它们需要扫描数据目录以查找匹配的数据库目录名称。
+	
+	在数据库中，避免使用非常表名查找值(或不使用查找值)的查询，因为它们需要扫描数据库目录以找到匹配的表文件。
+
 这一原则适用于下表中所示的INFORMATION_SCHEMA表，该表显示了通过常量查找值使服务器能够避免目录扫描的列。例如，如果要从表中进行选择，
 那么在WHERE子句中为TABLE_SCHEMA使用常量查找值可以避免数据目录扫描。
 
-表							指定要避免数据目录扫描的列		指定要避免数据库目录扫描的列
-COLUMNS						TABLE_SCHEMA					TABLE_NAME
-KEY_COLUMN_USAGE			TABLE_SCHEMA					TABLE_NAME
-PARTITIONS					TABLE_SCHEMA					TABLE_NAME
-REFERENTIAL_CONSTRAINTS		CONSTRAINT_SCHEMA				TABLE_NAME
-STATISTICS					TABLE_SCHEMA					TABLE_NAME
-TABLES						TABLE_SCHEMA					TABLE_NAME
-TABLE_CONSTRAINTS			TABLE_SCHEMA					TABLE_NAME
-TRIGGERS					EVENT_OBJECT_SCHEMA				EVENT_OBJECT_TABLE
-VIEWS						TABLE_SCHEMA					TABLE_NAME
+|           表            | 指定要避免数据目录扫描的列 | 指定要避免数据库目录扫描的列 |
+| :---------------------: | :------------------------: | :--------------------------: |
+|         COLUMNS         |        TABLE_SCHEMA        |          TABLE_NAME          |
+|    KEY_COLUMN_USAGE     |        TABLE_SCHEMA        |          TABLE_NAME          |
+|       PARTITIONS        |        TABLE_SCHEMA        |          TABLE_NAME          |
+| REFERENTIAL_CONSTRAINTS |     CONSTRAINT_SCHEMA      |          TABLE_NAME          |
+|       STATISTICS        |        TABLE_SCHEMA        |          TABLE_NAME          |
+|         TABLES          |        TABLE_SCHEMA        |          TABLE_NAME          |
+|    TABLE_CONSTRAINTS    |        TABLE_SCHEMA        |          TABLE_NAME          |
+|        TRIGGERS         |    EVENT_OBJECT_SCHEMA     |      EVENT_OBJECT_TABLE      |
+|          VIEWS          |        TABLE_SCHEMA        |          TABLE_NAME          |
+
+
 
 限制特定常量数据库名的查询的好处是只需要检查已命名的数据库目录。例如：
 	SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
 	WHERE TABLE_SCHEMA = 'test';
 	
-使用文字数据库名称测试使服务器能够只检查测试数据库目录，而不管可能有多少数据库。相比之下，下面的查询效率较低，
+	使用文字数据库名称测试使服务器能够只检查测试数据库目录，而不管可能有多少数据库。相比之下，下面的查询效率较低，
 因为它需要扫描数据目录以确定哪个数据库名称与模式'test%'匹配:
 	SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
 	WHERE TABLE_SCHEMA LIKE 'test%';
@@ -57,23 +60,23 @@ VIEWS						TABLE_SCHEMA					TABLE_NAME
 文件打开优化类型表示为:
 
 	SKIP_OPEN_TABLE:不需要打开表文件。通过扫描数据库目录，已经可以在查询中获得信息。
-
-	OPEN_FRM_ONLY:只需要打开表的.frm文件。
-
-	OPEN_TRIGGER_ONLY:只需要打开表的. trg文件。
-
-	OPEN_FULL_TABLE:未timized信息查找。必须打开.frm、. myd和. myi文件。
 	
+	OPEN_FRM_ONLY:只需要打开表的.frm文件。
+	
+	OPEN_TRIGGER_ONLY:只需要打开表的. trg文件。
+	
+	OPEN_FULL_TABLE:未timized信息查找。必须打开.frm、. myd和. myi文件。
+
 下面的列表说明了前面的优化类型如何应用于INFORMATION_SCHEMA表列。对于未命名的表和列，不应用任何优化。
 	
 	列:OPEN_FRM_ONLY应用于所有列
-
+	
 	KEY_COLUMN_USAGE: OPEN_FULL_TABLE 适用于所有列
-
+	
 	分区:OPEN_FULL_TABLE 适用于所有列
-
+	
 	REFERENTIAL_CONSTRAINTS: OPEN_FULL_TABLE 适用于所有列
-
+	
 	统计:
 		列					优化类型
 	TABLE_CATALOG		OPEN_FRM_ONLY
@@ -93,7 +96,7 @@ VIEWS						TABLE_SCHEMA					TABLE_NAME
 	COMMENT				OPEN_FRM_ONLY
 	
 	TABLE_CONSTRAINTS: OPEN_FULL_TABLE适用于所有列
-
+	
 	触发器:OPEN_TRIGGER_ONLY应用于所有列
 	
 	视图：
@@ -108,7 +111,7 @@ VIEWS						TABLE_SCHEMA					TABLE_NAME
 	SECURITY_TYPE			OPEN_FRM_ONLY
 	CHARACTER_SET_CLIENT	OPEN_FRM_ONLY
 	COLLATION_CONNECTION	OPEN_FRM_ONLY
-	
+
 3)使用EXPLAIN确定服务器是否可以对查询使用INFORMATION_SCHEMA优化
 
 这尤其适用于从多个数据库搜索信息的INFORMATION_SCHEMA查询，这可能会花费很长时间并影响性能。EXPLAIN输出中的额外值表示服务器可以使用前面描述的哪些优化

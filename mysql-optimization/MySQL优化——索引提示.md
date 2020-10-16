@@ -8,16 +8,16 @@
 
 	index_hint_list:
 		index_hint [index_hint] ...
-
+	
 	index_hint:
 		USE {INDEX|KEY}
 		  [FOR {JOIN|ORDER BY|GROUP BY}] ([index_list])
 	  | {IGNORE|FORCE} {INDEX|KEY}
 		  [FOR {JOIN|ORDER BY|GROUP BY}] (index_list)
-
+	
 	index_list:
 		index_name [, index_name] ...
-		
+
 使用索引(index_list)提示告诉MySQL只使用其中一个已命名索引来查找表中的行。替代语法忽略索引(index_list)告诉MySQL不要使用某些特定的索引。
 如果EXPLAIN显示MySQL使用了可能索引列表中的错误索引，那么这些提示很有用。
 
@@ -33,7 +33,7 @@ index_name值不需要是完整的索引名。它可以是索引名的明确前�
 
 	SELECT * FROM table1 IGNORE INDEX (col3_index)
 	  WHERE col1=1 AND col2=2 AND col3=3;
-	  
+
 索引提示的语法有以下特征:
 	1、从语法上讲，省略index_list使用INDEX是有效的，这意味着“不使用索引”。省略index_list作为FORCE INDEX或IGNORE INDEX是一个语法错误。
 	2、您可以通过在提示中添加FOR子句来指定索引提示的范围。这为优化器选择查询处理的各个阶段的执行计划提供了更细粒度的控制。

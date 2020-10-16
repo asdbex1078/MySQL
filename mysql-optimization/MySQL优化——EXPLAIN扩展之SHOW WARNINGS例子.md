@@ -1,9 +1,10 @@
 由于SHOW警告显示的语句可能包含特殊标记，以提供有关查询重写或优化器操作的信息，因此该语句不一定是有效的SQL，也不打算执行。
 输出还可能包括带有消息值的行，这些行提供关于优化器所采取的操作的附加非sql解释性注释。
 
+```sql
 mysql> EXPLAIN
        SELECT t1.a, t1.a IN (SELECT t2.a FROM t2) FROM t1\G
-*************************** 1. row ***************************
+********* 1. row *********
            id: 1
   select_type: PRIMARY
         table: t1
@@ -15,7 +16,7 @@ possible_keys: NULL
          rows: 4
      filtered: 100.00
         Extra: Using index
-*************************** 2. row ***************************
+********* 2. row *********
            id: 2
   select_type: SUBQUERY
         table: t2
@@ -30,18 +31,22 @@ possible_keys: a
 2 rows in set, 1 warning (0.00 sec)
 
 mysql> SHOW WARNINGS\G
-*************************** 1. row ***************************
+********* 1. row *********
   Level: Note
    Code: 1003
-Message: /* select#1 */ select `test`.`t1`.`a` AS `a`,
-         <in_optimizer>(`test`.`t1`.`a`,`test`.`t1`.`a` in
-         ( <materialize> (/* select#2 */ select `test`.`t2`.`a`
-         from `test`.`t2` where 1 having 1 ),
-         <primary_index_lookup>(`test`.`t1`.`a` in
+Message: /* select#1 / select test.t1.a AS a,
+         <in_optimizer>(test.t1.a,test.t1.a in
+         ( <materialize> (/ select#2 */ select test.t2.a
+         from test.t2 where 1 having 1 ),
+         <primary_index_lookup>(test.t1.a in
          <temporary table> on <auto_key>
-         where ((`test`.`t1`.`a` = `materialized-subquery`.`a`))))) AS `t1.a
-         IN (SELECT t2.a FROM t2)` from `test`.`t1`
+         where ((test.t1.a = materialized-subquery.a))))) AS t1.a
+         IN (SELECT t2.a FROM t2) from test.t1
 1 row in set (0.00 sec)
+
+```
+
+
 
 说明：
 	1、该查询有两个select，即select#1和select#2
@@ -52,7 +57,9 @@ Message: /* select#1 */ select `test`.`t1`.`a` AS `a`,
 	6、<auto_key>：为临时表自动生成的key
 	7、`materialized-subquery`.`a` ： 实现了col_name对内部临时表中列的引用， 以保存评估子查询的结果。
 	简化版的sql如下：
-		select t1.a,
+
+```sql
+select t1.a,
          <in_optimizer>(
 					 t1.a,t1.a in
 					 ( <materialize> (/* select#2 */ select t2.a
@@ -62,6 +69,10 @@ Message: /* select#1 */ select `test`.`t1`.`a` AS `a`,
 					 where ((t1.a = materialized-subquery.a))))
 				 ) AS t1.a
          IN (SELECT t2.a FROM t2) from t1
+```
+
+
+
 结论：		 
 	一、结合EXPLAIN可以看出，先执行子查询，后执行外层select
 	二、先查出select t2.a from t2 where 1 having 1；将结果缓存到内部临时表中，
