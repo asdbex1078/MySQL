@@ -168,6 +168,8 @@ ERROR 1142 (42000): SELECT command denied to user 'b'@'localhost' for table 'T'
 
 如果查询可以缓存，Mysql在这个阶段也会将结果放到查询缓存中。
 
+---
+
 ## （四）一条 UPDATE 语句的执行过程
 
 以一条SQL为例：
@@ -198,6 +200,8 @@ update tb_student A set A.age='19' where A.name=' 张三 ';
 - 如果 redo log 只是预提交但不是 commit 状态，这个时候就会去判断 binlog 是否完整，如果完整就提交 redo log, 不完整就回滚事务。
 
 这样就解决了数据一致性的问题。
+
+---
 
 ## （五）总结
 
