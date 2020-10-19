@@ -1,6 +1,7 @@
 # (一）架构问题
 
 ## 1.谈一下MYSQL架构，都由哪些组成？一条SQL大概的执行流程是什么？
+
 首先看看MySQL架构图：
 
 ![MySQL架构图](../mysql-image/1.0.1.MySQL架构图.jpg)
@@ -19,7 +20,25 @@
 
 更多详细介绍，参照这篇文章：[MySQL架构及组成介绍](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#mysql%E6%9E%B6%E6%9E%84%E5%8F%8A%E7%BB%84%E6%88%90%E4%BB%8B%E7%BB%8D)
 
+## 2. MySQL本身是有缓存的，为什么不建议使用MySQL本身的缓存，反而使用Redis、Memcache？
 
+关于MySQL缓存介绍，可以参考[这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#7%E7%BC%93%E5%AD%98%E4%B8%BB%E4%BB%B6caches--buffers)
+
+跟Redis、Memcache相比：
+
+1. 占用内存方面：
+   - MySQL缓存占用的是本机服务器的内存，对于InnoDB来说，本身就很吃内存，再加上最外层的缓存机制，及其耗费性能。
+   - redis、memcache可以不用跟MySQL同一台服务器，相对来说，为MySQL的高效运行节省了内存
+
+2. 缓存同步问题：
+   - MySQL缓存只是在一台机器上的缓存，不会同步到其他机器上，哪怕主从复制也不会同步缓存
+   - Redis、memcache可以分布式部署，同步缓存
+3. 缓存内容重复问题
+   - MySQL中，sql语句的注释，空格，大小写都会被认为是不同的SQL，从而缓存的内容会重复
+   - Redis、memcache相对灵活，可以自定义key。如可以根据功能来定义key，缓存内容就不会重复
+4. 高可用问题（实际上就是问题2）
+   - MySQL缓存不会同步，导致无法高可能
+   - Redis、Memcache可以分布式部署，可实现高可用
 
 # (二）schema问题
 

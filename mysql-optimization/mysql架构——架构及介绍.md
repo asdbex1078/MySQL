@@ -62,7 +62,7 @@ MySQL查询缓存是MySQL中比较独特的一个**缓存区域**，用来缓存
 如果通过hash值匹配到了一样的Query，则直接将cache中相应的Query结果集返回给客户端。
 **目前MySQL Query Cache只会cache select语句，其他类似show ，use的语句不会被cache**。MySQL 的每个Query Cache都是以SQL文本作为key来存储的，在应用Query Cache之前，SQL文本不会做任何处理。也就是说，**两个SQL语句，只要相差哪怕一个字符(例如大小写不一样，多一个空格，多注释)，那么这两个SQL将使用不同的Cache地址**。如: 下面三条SQL将会被存储在三个不同的缓存里，虽然他们的结果都是一样的。select * FROM people where name='surfchen'; select * FROM people where /*hey~*/ name='surfchen'; SELECT * FROM people where name='surfchen';
 
-#### 2️⃣MySQL Query Cache优缺点
+#### 2️⃣. MySQL Query Cache优缺点
 
 优点：Query Cache的查询，发生在MySQL接收到客户端的查询请求、查询权限验证之后和查询SQL解析之前。也就是说，当MySQL接收到客户端的查询SQL之后，仅仅只需要对其进行相应的权限验证之后，就会通过Query Cache来查找结果，甚至都不需要经过解析SQL、Optimizer模块进行执行计划的分析优化，更不需要发生任何存储引擎的交互。由于Query Cache是基于内存的，直接从内存中返回相应的查询结果，因此减少了大量的磁盘I/O和CPU计算，导致效率非常高。
 
@@ -117,6 +117,13 @@ MySQL查询缓存是MySQL中比较独特的一个**缓存区域**，用来缓存
 ![1.0.5.查询sql大概执行流程](../mysql-image/1.0.5.查询sql大概执行流程.png)
 
 ### 1.客户端发送一条查询给服务器
+
+MySQL客户端/服务端通信协议是**“半双工”**的：**在任一时刻，要么是服务器向客户端发送数据，要么是客户端向服务器发送数据，这两个动作不能同时发生**。**一旦一端开始发送消息，另一端要接收完整个消息才能响应它，所以我们无法也无须将一个消息切成小块独立发送，也没有办法进行流量控制。**
+
+客户端用一个单独的数据包将查询请求发送给服务器，所以当查询语句很长的时候，需要设置`max_allowed_packet`参数。但是需要注意的是，如果查询实在是太大，服务端会拒绝接收更多数据并抛出异常。
+
+与之相反的是，服务器响应给用户的数据通常会很多，由多个数据包组成。但是当服务器响应客户端请求时，客户端必须完整的接收整个返回结果，而不能简单的只取前面几条结果，然后让服务器停止发送。**因而在实际开发中，尽量保持查询简单且只返回必需的数据，减小通信间数据包的大小和数量是一个非常好的习惯，这也是查询中尽量避免使用`SELECT *`以及加上LIMIT限制的原因之一。**
+
 我们在数据库层执行SQL语句时，应用程序会连接到相应的数据库服务器，把SQL语句发送给服务器处理。
 ![1.0.6.查看服务器正在执行的线程](../mysql-image/1.0.6.查看服务器正在执行的线程.jpg)
 
@@ -188,7 +195,7 @@ ERROR 1142 (42000): SELECT command denied to user 'b'@'localhost' for table 'T'
 
 如果查询可以缓存，Mysql在这个阶段也会将结果放到查询缓存中。
 
-mysql服务器处理完最后一个关联查询后，开始生成第一条数据后，就会向客户端不断地发送数据。所有结果集中的每一条数据都会以一个满足客户端/服务器通信协议的方式进行封包，通过TCP协议进行传输。
+mysql服务器处理完最后一个关联查询后，开始生成第一条数据后，就会向客户端不断地发送数据。这样服务端就无须存储太多结果而消耗过多内存，也可以让客户端第一时间获得返回结果。需要注意的是，结果集中的每一行都会以一个满足①中所描述的通信协议的数据包发送，再通过TCP协议进行传输，在传输过程中，可能对MySQL的数据包进行缓存然后批量发送。
 
 ---
 
@@ -239,3 +246,4 @@ update tb_student A set A.age='19' where A.name=' 张三 ';
 > 1. [谈谈MySQL架构体系](https://www.cnblogs.com/wangjiming/p/10410904.html)
 > 2. 《高性能MySQL第三版》
 > 3. [[Mysql 一条sql查询语句是如何执行的](https://www.cnblogs.com/jw-yahui/articles/10769563.html)](https://www.cnblogs.com/jw-yahui/articles/10769563.html)
+> 4. [MySQL优化原理](https://zhuanlan.zhihu.com/p/60761527)
