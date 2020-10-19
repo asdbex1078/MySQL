@@ -52,7 +52,27 @@ Connectors组件，是MySQL向外提供的交互组件，如java,.net,php等语�
 
 ### （7）缓存主件（Caches & Buffers）
 
-全局缓存、存储引擎特定缓存、缓冲组件
+全局缓存、存储引擎特定缓存、缓冲组件。建议关闭缓存，而且默认是关闭的。8.0已被删除
+
+#### 1️⃣. MySQL查询缓存简介
+
+MySQL查询缓存是MySQL中比较独特的一个**缓存区域**，用来缓存特定Query的整个结果集信息，且共享给所有客户端。为了提高完全相同的Query语句的响应速度，MySQL Server会**对查询语句进行Hash计算后，把得到的hash值与Query查询的结果集对应存放在Query Cache中**。当MySQL Server打开Query Cache之后，MySQL Server会对接收到的每一个SELECT 语句通过特定的Hash算法计算该Query的Hash值，然后通过该hash值到Query Cache中去匹配。
+
+如果没有匹配，将这个hash值存放在一个hash链表中，并将Query的结果集存放到cache中，存放hashi值链表的每个hash节点存放了相应Quey结果集在cache中的地址，以及该query所涉及到一些table相关信息；
+如果通过hash值匹配到了一样的Query，则直接将cache中相应的Query结果集返回给客户端。
+**目前MySQL Query Cache只会cache select语句，其他类似show ，use的语句不会被cache**。MySQL 的每个Query Cache都是以SQL文本作为key来存储的，在应用Query Cache之前，SQL文本不会做任何处理。也就是说，**两个SQL语句，只要相差哪怕一个字符(例如大小写不一样，多一个空格，多注释)，那么这两个SQL将使用不同的Cache地址**。如: 下面三条SQL将会被存储在三个不同的缓存里，虽然他们的结果都是一样的。select * FROM people where name='surfchen'; select * FROM people where /*hey~*/ name='surfchen'; SELECT * FROM people where name='surfchen';
+
+#### 2️⃣MySQL Query Cache优缺点
+
+优点：Query Cache的查询，发生在MySQL接收到客户端的查询请求、查询权限验证之后和查询SQL解析之前。也就是说，当MySQL接收到客户端的查询SQL之后，仅仅只需要对其进行相应的权限验证之后，就会通过Query Cache来查找结果，甚至都不需要经过解析SQL、Optimizer模块进行执行计划的分析优化，更不需要发生任何存储引擎的交互。由于Query Cache是基于内存的，直接从内存中返回相应的查询结果，因此减少了大量的磁盘I/O和CPU计算，导致效率非常高。
+
+缺点：Query Cache的优点很明显，但是也不能忽略它所带来的一些缺点：
+
+1. hash计算影响性能问题。
+   查询语句的hash计算和hash查找带来的资源消耗。如果将query_cache_type设置为1（也就是ON），那么MySQL会对每条接收到的SELECT类型的查询进行hash计算，然后查找这个查询的缓存结果是否存在。虽然hash计算和查找的效率已经足够高了，一条查询语句所带来的开销可以忽略，**但一旦涉及到高并发，有成千上万条查询语句时，hash计算和查找所带来的开销就必须重视了。**
+2. Query Cache失效问题。**如果表的变更比较频繁，则会造成Query Cache的失效率非常高。表的变更不仅仅指表中的数据发生变化，还包括表结构或者索引的任何变化。**
+3. 内存浪费问题。**查询语句不同，但查询结果相同的查询都会被缓存，这样便会造成内存资源的过度消耗**。查询语句的字符大小写、空格或者注释的不同，Query Cache都会认为是不同的查询（因为他们的hash值会不同）。
+   相关系统变量设置不合理会造成大量的内存碎片，这样便会导致Query Cache频繁清理内存。
 
 ### （8）插件式存储引擎（Pluggable Storage Engines）
 
