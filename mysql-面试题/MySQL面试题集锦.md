@@ -243,3 +243,53 @@
      因为Myisam引擎存储了精确的行数，并且可以非常快速地返回总行数。当只有在第一列定义为NOT NULL时，COUNT(1)才会跟count(*)一样。
   2. MYISAM 的count(\*) 性能高于 InnoDB的count(*).由于 MVCC 多版本并发控制，InnoDB中不能保存精确的总行数
 
+# （三）索引方面的问题
+
+## N. 为什么不建议对性别建立索引？那我非要对性别进行查询（例如：查北京东城的男生），有什么解决方案？
+
+1. 任何字段都可以建立索引，只是，有时候不建议建立索引，比如性别，重新性太高，为百分之50。
+
+   - 当MySQL走一个索引，需要扫描的数据量达到全表的百分之30时，就不考虑这个索引了，更何况性别达到了50%。
+   - 随着MySQL版本升级，要求的比例远低于百分之30。加入了其他考虑因素，就是MySQL的成本模型，考虑cpu io等
+
+2. 可以强制让MySQL走性别这个索引，比如100w条数据，查询性别为男的数据就有50w条。可以强制走性别这个索引。在底层实现上，50W个性别为男的数据页需要先放到缓冲池中，在缓冲池中找到对应的 50w 个主键ID，再**回表**查50w条最终结果，性能消耗上已经不亚于全表扫描。这就是不建议给性别建立单列索引的原因。
+
+3. 解决方案：可以把性别和其他字段建立复合索引，性别放前面，当需要查询其他字段时，对性别in查询，是可以走索引的。这就是选择性极低的放最前面的原理。**这样设计可以巧妙的利用索引，最终设计方案需按业务需求来定。**
+   ——方案参考自《高性能MySQL 第3版》
+
+   ```sql
+   基础表：
+   CREATE TABLE `user1` (
+     `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+     `user_name` varchar(100) DEFAULT NULL COMMENT '用户名',
+     `user_age` tinyint(3) DEFAULT NULL COMMENT '用户年龄',
+     `user_password` varchar(100) DEFAULT NULL COMMENT '用户密码',
+     `user_sex` tinyint(1) DEFAULT NULL COMMENT '性别 1-男，0-女',
+     `user_province` varchar(32) DEFAULT NULL COMMENT '用户所在省',
+     `user_city` varchar(32) DEFAULT NULL COMMENT '用户所在城市',
+     `user_area` varchar(32) DEFAULT NULL COMMENT '用户所在区',
+     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+     `modified_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+     PRIMARY KEY (`user_id`)
+   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+   
+   案例一：
+   # 查询北京东城区的总人数
+   mysql> create index idx_sex_province_city_area on user1 (user_sex,user_province,user_city,user_area);
+   mysql> explain select count(1) from user1 where user_sex in ('1','0') and user_province = '北京市' and user_city = '东城区';
+   
+   案例二：
+   # 查询浙江杭州西湖区年龄大于20的女生
+   mysql> create index idx_sex_province_city_area_age on user (user_sex,user_province,user_city,user_area,user_age)
+   mysql> explain select * from user where sex = '0' and province = '浙江省' and city = '杭州市' and age > 20;
+   ```
+
+   案例一explain情况：可发现 type 是range，rows是29，filtered为100代表走了预先设计的索引
+
+   ![案例一explain情况](../mysql-image/面试题三——案例一explain情况.png)
+
+   案例二explain情况：同案例一
+
+   ![案例二explain情况](../mysql-image/面试题三——案例二explain情况.jpg)
+
+   其中，体会一下案例二中，age放最后的好处。age放最后，可以进行范围查询，那么问题又来了：为什么放最后？因为范围查询之后会索引失效。那为什么范围查询之后，会索引失效？且听之后分解~
