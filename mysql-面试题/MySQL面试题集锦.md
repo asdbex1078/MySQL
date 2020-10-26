@@ -71,6 +71,135 @@
 
 不建议使用MySQL的缓存是指，不建议使用MySQL架构中的缓存组件，并不是同时否定了InnoDB中的缓存功能。
 
+## 4. MySQL存储引擎有哪些？Memory引擎了解过没，什么情况下会用到？TempTable呢？
+
+通过 `show engines;`可查看MySQL中的存储引擎
+
+![面试题一——查看存储引擎.jpg](../mysql-image/面试题一——查看存储引擎.jpg)
+
+**(1) . InnoDB**：从 MySQL5.5.5 开始成为默认存储引擎。特性：支持外键、事务、行锁、容灾修复数据。
+
+**(2) . MYISAM**：MySQL5.1及之前版本的默认储存引擎，支持全文索引、表锁，无事务，无法容灾修复数据。
+
+**(3) . MEG_MYISAM**：又可称为 MERGE 存储引擎，是多个 MYISAM 表的集合，相当于分表。例如：
+
+```sql
+CREATE TABLE `user_1` (
+`id` int(11) NOT NULL AUTO_INCREMENT ,
+`user_name` varchar(255) NULL ,
+`user_sex` varchar(255) NULL ,
+`user_birth_date` datetime NULL ,
+PRIMARY KEY (`id`)
+)ENGINE = MYISAM DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `user_2` (
+`id` int(11) NOT NULL AUTO_INCREMENT ,
+`user_name` varchar(255) NULL ,
+`user_sex` varchar(255) NULL ,
+`user_birth_date` datetime NULL ,
+PRIMARY KEY (`id`)
+)ENGINE = MYISAM DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `user_3` (
+`id` int(11) NOT NULL AUTO_INCREMENT ,
+`user_name` varchar(255) NULL ,
+`user_sex` varchar(255) NULL ,
+`user_birth_date` datetime NULL ,
+PRIMARY KEY (`id`)
+)ENGINE = MYISAM DEFAULT CHARSET=utf8mb4;
+
+# 插入表数据
+INSERT INTO user_1 (user_name,user_sex,user_birth_date) VALUES ('张1', '男', now());
+INSERT INTO user_1 (user_name,user_sex,user_birth_date) VALUES ('张2', '男', now());
+INSERT INTO user_1 (user_name,user_sex,user_birth_date) VALUES ('张3', '男', now());
+
+INSERT INTO user_2 (user_name,user_sex,user_birth_date) VALUES ('王1', '女', now());
+INSERT INTO user_2 (user_name,user_sex,user_birth_date) VALUES ('王2', '女', now());
+INSERT INTO user_2 (user_name,user_sex,user_birth_date) VALUES ('王3', '女', now());
+
+INSERT INTO user_3 (user_name,user_sex,user_birth_date) VALUES ('李1', '女', now());
+INSERT INTO user_3 (user_name,user_sex,user_birth_date) VALUES ('李2', '女', now());
+INSERT INTO user_3 (user_name,user_sex,user_birth_date) VALUES ('李3', '女', now());
+
+2.创建merge表
+CREATE TABLE `user_merge` (
+`id` int(11) NOT NULL AUTO_INCREMENT ,
+`user_name` varchar(255) NULL ,
+`user_sex` varchar(255) NULL ,
+`user_birth_date` datetime NULL ,
+PRIMARY KEY (`id`)
+)ENGINE = MERGE UNION = (user_1,user_2,user_3);
+
+# 然后查询该表，select * from user_merge 会把 user1、user2、user3 的所有数据查出来
+```
+
+**(4) . BlackHole**：黑洞存储引擎，没有实现任何存储机制，它会丢弃所有插入的数据，不做任何保存。但是服务器会记录 BlackHole 的日志，所以可以用于复制数据到备库，或者只是简单地记录到日志。这种特殊的存储引擎可以在一些特殊的复制架构和日志审核时发挥作用。但会出现很多以外的问题，不建议使用。
+
+**(5) . MEMORY**：基于内存的存储引擎。
+
+​	特征：
+
+- 基于内存的表，服务器重启后，表结构会被保留，但表中的数据会被清空。
+
+- 不需要进行磁盘IO，比 MYISAM 快了一个数量级。
+
+- 表级锁，故并发插入性能较低。
+
+- 每一行是固定的，VARCHAR 列在 memory 存储引擎中会变成 CHAR，可能导致内存浪费。
+
+- 不支持 BLOB 或 TEXT 列，如果sql返回的结果列中包含 BLOB 或 TEXT，就直接采用 MYISAM 存储引擎，在磁盘上建临时表
+
+- 支持哈希索引，B+树索引
+
+  
+
+MEMORY 存储引擎在很多地方可以发挥很好的作用：
+
+- 用于查找或映射表，例如邮编和州名的映射表
+- 用于缓存周期性聚合数据的结果
+- **用于保存数据分析中产生的中间结果。即SQL执行过程中用到的临时表**
+- **监控MySQL内存中的执行情况，例如：information_schema 库下的表基本都是 memory 存储引擎，监控InnoDB缓冲池中page(INNODB_BUFFER_PAGE表)，InnoDB缓冲池状态(INNODB_BUFFER_POOL_STATS表)、InnoDB缓存页淘汰记录(INNODB_BUFFER_PAGE_LRU表)、InnoDB锁等待(INNODB_LOCK_WAITS表)、InnoDB锁信息(INNODB_LOCKS表)、InnoDB中正在执行的事务(INNODB_TRX表)等**
+
+MEMORY 存储引擎默认 hash 索引，故等值查询特别快。同时也支持B+树索引。虽然查询速度特别快，但依旧无法取代传统的磁盘建表。
+
+**(6) . CSV**：该引擎支持将普通的 CSV 文件作为MySQL的表处理，但不支持索引。CSV 储存引擎可以在数据库运行时拷入和拷出文件。可以将 Excel 等电子文件中的数据转化为 CSV 文件，然后复制到MySQL数据目录下，就能在MySQL中打开和使用。同样，MySQL将数据写入 CSV 引擎表后，其他外部程序就可以读取 CSV 格式的数据，作为数据交换的机制，十分有用。
+
+**(7) . ARCHIVE**：只支持 INSERT 和 SELECT 操作。
+
+**(8) . PERFORMANCE_SCHEMA**：用于监控MySQL server在一个较低级别的运行过程中的资源消耗、资源等待等情况，它具有以下特点：
+
+1. 提供了一种在数据库运行时实时检查server的内部执行情况的方法。performance_schema 数据库中的表使用performance_schema存储引擎。该数据库主要关注数据库运行过程中的性能相关的数据，与information_schema不同，information_schema主要关注server运行过程中的元数据信息。
+2. performance_schema通过监视server的事件来实现监视server内部运行情况， “事件”就是server内部活动中所做的任何事情以及对应的时间消耗，利用这些信息来判断server中的相关资源消耗在了哪里?一般来说，事件可以是函数调用、操作系统的等待、SQL语句执行的阶段(如sql语句执行过程中的parsing 或 sorting阶段)或者整个SQL语句与SQL语句集合。事件的采集可以方便的提供server中的相关存储引擎对磁盘文件、表I/O、表锁等资源的同步调用信息。
+3. performance_schema中的事件与写入二进制日志中的事件(描述数据修改的events)、事件计划调度程序(这是一种存储程序)的事件不同。performance_schema中的事件记录的是server执行某些活动对某些资源的消耗、耗时、这些活动执行的次数等情况。
+4. performance_schema中的事件只记录在本地server的performance_schema中，其下的这些表中数据发生变化时不会被写入binlog中，也不会通过复制机制被复制到其他server中。
+5. 当前活跃事件、历史事件和事件摘要相关的表中记录的信息。能提供某个事件的执行次数、使用时长。进而可用于分析某个特定线程、特定对象(如mutex或file)相关联的活动。
+6. performance_schema存储引擎使用server源代码中的“检测点”来实现事件数据的收集。对于performance_schema实现机制本身的代码没有相关的单独线程来检测，这与其他功能(如复制或事件计划程序)不同。
+7. 收集的事件数据存储在performance_schema数据库的表中。这些表可以使用SELECT语句查询，也可以使用SQL语句更新performance_schema数据库中的表记录(如动态修改performance_schema的setup_*开头的几个配置表，但要注意：配置表的更改会立即生效，这会影响数据收集)（也可以通过SQL语句来控制那些事件被收集）。
+8. performance_schema的表中的数据不会持久化存储在磁盘中，而是保存在内存中，一旦服务器重启，这些数据会丢失(包括配置表在内的整个performance_schema下的所有数据)。
+9. MySQL支持的所有平台中事件监控功能都可用，但不同平台中用于统计事件时间开销的计时器类型可能会有所差异。
+
+performance_schema实现机制遵循以下设计目标：
+
+- 启用performance_schema不会导致server的行为发生变化。例如，它不会改变线程调度机制，不会导致查询执行计划(如EXPLAIN)发生变化。
+- 启用performance_schema之后，server会持续不间断地监测，开销很小。不会导致server不可用。
+- 在该实现机制中没有增加新的关键字或语句，解析器不会变化。
+- 即使performance_schema的监测机制在内部对某事件执行监测失败，也不会影响server正常运行。
+- 如果在开始收集事件数据时碰到有其他线程正在针对这些事件信息进行查询，那么查询会优先执行事件数据的收集，因为事件数据的收集是一个持续不断的过程，而检索(查询)这些事件数据仅仅只是在需要查看的时候才进行检索。也可能某些事件数据永远都不会去检索。
+
+> 更多关于 performance_schema 的使用参考[这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/B.%E9%BB%98%E8%AE%A4%E5%BA%93-performance%20schema.md)
+
+**(9) . TempTable**：MySQL8.0之后的存储引擎。
+
+- 8.0之前，内存临时表用**Memory**引擎创建，但假如字段中有BLOB或TEXT,或结果太大，就会转用MYISM在**磁盘上**建表
+- 8.0之后内存临时表由MEMORY引擎更改为TempTable引擎，相比于前者，后者**支持以变长方式存储VARCHAR，VARBINARY等变长字段**。从MySQL 8.0.13开始，**TempTable引擎**支持BLOB字段。如果超过内存表大小，则用InnoDB建表。
+
+知识点补充：
+
+1. 当列中有VARCHAR类型时，MySQL将他读取到内存中，会给他分配定义该VARCHAR时最大的空间，所以定义好VARCHAR的长度非常重要
+2. 在磁盘上进行建临时表时，5.7之前默认使用MYISAM建磁盘表。5.7版本，可以让用户自己选择，默认使用InnoDB建磁盘临时表。8.0以后不再让用户选择，直接用InnoDB
+
+> 该问题答案参考自《高性能MySQL 第三版》
+
 # (二）schema问题
 
 ## 1. MySQL中，主键自增ID用完了会发生什么问题？该怎么解决？
@@ -282,7 +411,7 @@
    案例二：
    # 查询浙江杭州西湖区年龄大于20的女生
    mysql> create index idx_sex_province_city_area_age on user (user_sex,user_province,user_city,user_area,user_age)
-   mysql> explain select * from user where sex = '0' and province = '浙江省' and city = '杭州市' and age > 20;
+   mysql> explain select * from user1 where user_sex = '0' and user_province = '浙江省' and user_city = '杭州市' and user_age > 20;
    ```
 
    案例一explain情况：可发现 type 是range，rows是29，filtered为100代表走了预先设计的索引
