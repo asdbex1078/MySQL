@@ -200,6 +200,10 @@ performance_schema实现机制遵循以下设计目标：
 
 > 该问题答案参考自《高性能MySQL 第三版》
 
+## 5.MySQL是一个单进程多线程架构，分别有哪些线程？作用是什么？
+
+答案详见[这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#innodb%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B)
+
 # （二）schema问题
 
 ## 1. MySQL中，主键自增ID用完了会发生什么问题？该怎么解决？
