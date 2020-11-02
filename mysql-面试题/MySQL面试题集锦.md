@@ -204,6 +204,25 @@ performance_schema实现机制遵循以下设计目标：
 
 答案详见[这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#innodb%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B)
 
+## 6.MYSQL优化器是怎么运行的，为什么会做出错误决定，使用错误的索引？怎么解决？
+
+在问题1中，已经涉及到了优化器的运行。此处不再赘述，查看[MySQL架构及组成介绍](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#mysql%E6%9E%B6%E6%9E%84%E5%8F%8A%E7%BB%84%E6%88%90%E4%BB%8B%E7%BB%8D)
+
+**优化器为什么会做出错误决定，使用了不太对的索引？**这里错误决定分两类，第一，彻底错误。第二，基于成本最低，但执行速度不是最快。
+
+- 第一种情况：由于InnoDB的 MVCC 功能和随机采样方式，默认随机采取8个数据页，当做总体数据。以部分代表整体，本来就有错误的风险。加上数据不断地添加过程中，索引树可能会分裂，结果更加不准确。
+  解决方案：	
+
+  1. 执行 ANALYZE TABLE <tableName> ,可以重新构建索引，使索引树不过于分裂。
+  2. 调整参数，加大InnoDB采样的页数，页数越大越精确，但性能消耗更高。一般不建议这么干
+
+- 第二种情况：在优化阶段，会对表中所有索引进行对比，优化器基于成本的原因，选择成本最低的索引，所以会错过最佳索引。带来的问题便是，执行速度很慢。
+  解决方案：
+
+  ​	第一步：通过explain查看执行计划，结合sql条件查看可以利用哪些索引。
+
+  ​	第二步：使用 `force index(indexName)`强制走指定索引。弊端就是后期若索引名发生改变，或索引被删除，该sql语句需要调整
+
 # （二）schema问题
 
 ## 1. MySQL中，主键自增ID用完了会发生什么问题？该怎么解决？
@@ -574,5 +593,5 @@ performance_schema实现机制遵循以下设计目标：
 
 ## 1.InnoDB的缓冲池有缓存页，他是怎么淘汰缓存的？跟传统的LRU相比有何优势？
 
-参考这里：[InnoDB缓冲池中的 LRU list](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.2.0.InnoDB%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E7%BC%93%E5%86%B2%E6%B1%A0.md#lru-list)。另外Redis的缓存淘汰策略也是 LRU 算法，后期再整理。
+参考这里：[InnoDB缓冲池中的 LRU list](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.2.0.InnoDB%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E7%BC%93%E5%86%B2%E6%B1%A0.md#lru-list)。另外Redis的缓存淘汰策略也有 LRU 算法，后期再整理。
 
