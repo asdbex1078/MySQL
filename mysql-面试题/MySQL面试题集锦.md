@@ -531,6 +531,8 @@ performance_schema实现机制遵循以下设计目标：
 
 ## 4.MySQL中字段有哪些类型？
 
+引入一位大神博客，答案参考[这里](https://github.com/crisxuan/bestJavaer/blob/master/mysql/mysql-datatype.md#mysql-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
+
 # （三）索引方面的问题
 
 ## N. 为什么不建议对性别建立索引？那我非要对性别进行查询（例如：查北京东城的男生），有什么解决方案？
