@@ -529,6 +529,8 @@ performance_schema实现机制遵循以下设计目标：
 
 严格遵守范式和反范式都有各自的优缺点，所以在现实中，需要混用范式和反范式，最常见的反范式化数据的方法就是复制或缓存，在不同的表中冗余相同的特定列。可以用触发器来级联更新冗余值。
 
+## 4.MySQL中字段有哪些类型？
+
 # （三）索引方面的问题
 
 ## N. 为什么不建议对性别建立索引？那我非要对性别进行查询（例如：查北京东城的男生），有什么解决方案？
@@ -595,3 +597,47 @@ performance_schema实现机制遵循以下设计目标：
 
 参考这里：[InnoDB缓冲池中的 LRU list](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.2.0.InnoDB%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E7%BC%93%E5%86%B2%E6%B1%A0.md#lru-list)。另外Redis的缓存淘汰策略也有 LRU 算法，后期再整理。
 
+
+
+---
+
+> 本文主要参考书籍、地址：
+>
+> 1. MySQL官方网站
+>
+> 2. 阿里数据库月报
+>
+>    - [InnoDB undo log漫游](http://mysql.taobao.org/monthly/2015/04/01/)
+>    - [MySQL · 引擎特性 · Innodb 表空间](http://mysql.taobao.org/monthly/2019/10/01/)
+>    - [MySQL · 引擎特性 · Latch 持有分析](http://mysql.taobao.org/monthly/2020/03/07/)
+>    - [MySQL · 引擎特性 · InnoDB 数据文件简述](http://mysql.taobao.org/monthly/2020/08/06/)
+>
+> 3. 阿里云开发者社区
+>
+>    - [InnoDB的read view，回滚段和purge过程简介](https://developer.aliyun.com/article/560506)
+> 4. 《高性能MySQL 第3版》
+>
+> 5. 《MySQL技术内幕 InnoDB存储引擎》
+>
+> 6. 简书博客
+>
+>    - [MySQL中InnoDB引擎中页的概念](https://www.jianshu.com/p/e5e3f8a823c3)
+>
+> 7. CSDN博客
+>
+>    - [InnoDB引擎--存储结构与文件](https://blog.csdn.net/john_lw/article/details/80306122)
+>    - [详细分析MySQL事务日志(redo log和undo log)](https://www.cnblogs.com/f-ck-need-u/p/9010872.html)
+>    - [InnoDB引擎--存储结构与文件](https://blog.csdn.net/john_lw/article/details/80306122)
+>    - [MySQL学习总结](https://blog.csdn.net/howinfun/category_9704174.html)
+>    - [InnoDB锁分析](https://www.cnblogs.com/crazylqy/p/7611069.html)
+>
+> 8. 知乎
+>
+>    - [redo log检查点](https://zhuanlan.zhihu.com/p/148414574)
+>    - [深入理解InnoDB](https://zhuanlan.zhihu.com/p/161737133)
+>
+> 9. 其他博客
+>
+>    - [详解redo log 和 undo log](https://www.cnblogs.com/f-ck-need-u/p/9010872.html)
+>    - [MySQL中一条更新语句是如何执行的](https://www.cnblogs.com/wangchunli-blogs/p/10393139.html)
+>    - [InnoDB存储引擎关键特性](https://www.it610.com/article/5037373.htm)
