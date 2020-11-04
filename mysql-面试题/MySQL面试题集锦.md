@@ -1,3 +1,7 @@
+# mysql面试题，每日一更，敬请关注~~
+
+（直接点击目录，即可直达答案位置）
+
 [（一）架构问题](#%E4%B8%80%E6%9E%B6%E6%9E%84%E9%97%AE%E9%A2%98)
 
   * [1\.谈一下MYSQL架构，都由哪些组成？一条SQL大概的执行流程是什么？](#1%E8%B0%88%E4%B8%80%E4%B8%8Bmysql%E6%9E%B6%E6%9E%84%E9%83%BD%E7%94%B1%E5%93%AA%E4%BA%9B%E7%BB%84%E6%88%90%E4%B8%80%E6%9D%A1sql%E5%A4%A7%E6%A6%82%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E6%98%AF%E4%BB%80%E4%B9%88)
@@ -47,6 +51,12 @@
 
 更多详细介绍，参照这篇文章：[MySQL架构及组成介绍](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#mysql%E6%9E%B6%E6%9E%84%E5%8F%8A%E7%BB%84%E6%88%90%E4%BB%8B%E7%BB%8D)
 
+
+
+---
+
+
+
 ## 2. MySQL本身是有缓存的，为什么不建议使用MySQL本身的缓存，反而使用Redis、Memcache？
 
 关于MySQL缓存介绍，可以参考[这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/mysql%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%9E%B6%E6%9E%84%E5%8F%8A%E4%BB%8B%E7%BB%8D.md#7%E7%BC%93%E5%AD%98%E4%B8%BB%E4%BB%B6caches--buffers)
@@ -66,6 +76,12 @@
 4. 高可用问题（实际上就是问题2）
    - MySQL缓存不会同步，导致无法高可能
    - Redis、Memcache可以分布式部署，可实现高可用
+
+
+
+---
+
+
 
 ## 3. InnoDB缓冲池里面有缓存，而且经常用，上边不是说MySQL不建议使用缓存吗？
 
@@ -97,6 +113,12 @@
   3. 可否关闭：是InnoDB缓冲池自带的功能，**无法关闭，无法卸载**。如果InnoDB的缓冲池被关闭或卸载，则InnoDB直接瘫痪。所以说缓冲池是InnoDB的最重要的一部分。
 
 不建议使用MySQL的缓存是指，不建议使用MySQL架构中的缓存组件，并不是同时否定了InnoDB中的缓存功能。
+
+
+
+---
+
+
 
 ## 4. MySQL存储引擎有哪些？Memory引擎了解过没，什么情况下会用到？TempTable呢？
 
@@ -227,9 +249,21 @@ performance_schema实现机制遵循以下设计目标：
 
 > 该问题答案参考自《高性能MySQL 第三版》
 
+
+
+---
+
+
+
 ## 5.MySQL是一个单进程多线程架构，分别有哪些线程？作用是什么？
 
 答案详见[这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#innodb%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B)
+
+
+
+---
+
+
 
 ## 6.MYSQL优化器是怎么运行的，为什么会做出错误决定，使用错误的索引？怎么解决？
 
@@ -249,6 +283,12 @@ performance_schema实现机制遵循以下设计目标：
   ​	第一步：通过explain查看执行计划，结合sql条件查看可以利用哪些索引。
 
   ​	第二步：使用 `force index(indexName)`强制走指定索引。弊端就是后期若索引名发生改变，或索引被删除，该sql语句需要调整
+
+
+
+---
+
+
 
 # （二）schema问题
 
@@ -333,6 +373,12 @@ performance_schema实现机制遵循以下设计目标：
 4. 将主键id变成 varchar 类型，失去了自增属性
 
 5. 采用分布式ID，如雪花算法等，转成varchar类型绝对够用
+
+
+
+---
+
+
 
 ## 2. count(1) 和 count(*) 相比有什么差异？与count(列名) 相比呢？
 
@@ -421,6 +467,10 @@ performance_schema实现机制遵循以下设计目标：
   1. Myisam表中，只执行 select count(\*) from table，没有任何条件，没有任何其他返回值。则会很快返回总行数。
      因为Myisam引擎存储了精确的行数，并且可以非常快速地返回总行数。当只有在第一列定义为NOT NULL时，COUNT(1)才会跟count(*)一样。
   2. MYISAM 的count(\*) 性能高于 InnoDB的count(*).由于 MVCC 多版本并发控制，InnoDB中不能保存精确的总行数
+
+---
+
+
 
 ## 3.谈一下数据库的三大范式？为什么需要反范式？
 
@@ -556,9 +606,119 @@ performance_schema实现机制遵循以下设计目标：
 
 严格遵守范式和反范式都有各自的优缺点，所以在现实中，需要混用范式和反范式，最常见的反范式化数据的方法就是复制或缓存，在不同的表中冗余相同的特定列。可以用触发器来级联更新冗余值。
 
+
+
+---
+
+
+
 ## 4.MySQL中字段有哪些类型？
 
 引入一位大神博客，答案参考[这里](https://github.com/crisxuan/bestJavaer/blob/master/mysql/mysql-datatype.md#mysql-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
+
+
+
+---
+
+## 5.VARCHAR 和 CHAR有什么区别？除了空格的差异还有其他吗？
+
+1. 长度是否可变：
+
+   - varchar：可变长，有几个字符存储几个。
+   - char：不可变长。不足指定个数，尾部用空格填满。
+
+2. 尾部空格问题：
+
+   - varchar：MySQL5.0及更高版本会保留尾部空格，4.1或更老的版本会去除尾部空格。
+   - char：会去除尾部的空格。这个时候问题来了，第1点说用空格补位，这里又说去掉末尾空格。是不是很矛盾？查询时，返回的值去掉了尾部空格，但底层存储，是带空格的，因为开辟的空间就是那么大。
+
+   ```sql
+   # 一下案例显示 char 显示的时候会去掉尾部空格
+   mysql> create table vctest1 (ch char(6));
+   Query OK, 0 rows affected (0.05 sec)
+   
+   mysql> insert into vctest1 values("abc"),("abc  "),("  abc");
+   Query OK, 3 rows affected (0.01 sec)
+   Records: 3  Duplicates: 0  Warnings: 0
+   
+   mysql> select length(ch) from vctest1;
+   +------------+
+   | length(ch) |
+   +------------+
+   |          3 |
+   |          3 |
+   |          5 |
+   +------------+
+   3 rows in set (0.05 sec)
+   
+   mysql> select concat("'",ch,"'") as ch from vctest1;
+   +---------+
+   | ch      |
+   +---------+
+   | 'abc'   |
+   | 'abc'   |
+   | '  abc' |
+   +---------+
+   3 rows in set (0.06 sec)
+   ```
+
+   
+
+3. 空间占用情况：
+
+   - varchar：在表中存储数据时，只占用必要的空间。存储字节数 = 数据值的字节和 + 1字节或2个字节。是因为按照可能的数据大小，分为0 - 255(28)、256 - 65535(216)，刚好对应1字节和2字节。另外数据值得字节与编码有关。**故一定程度上，varchar比char节省空间，但不绝对，当MySQL使用 ROW_FORMAT=FIXED 时，每一行使用定长存储。**
+   - char：根据定义字符串的长度分配空间。存储字节数 = 数据值的字节和 + 补位空格数
+
+4. 是否使用额外的空间：
+
+   - varchar：**它需要 1~2个额外字节表示字符串长度**。当列的最大长度 <= 255字节时，使用1个字节；否则使用两个字节。
+   - char：定义多少就是多少，不需要额外空间
+
+   ```sql
+   # 验证 VARCHAAR 是否占两个字节？验证是否与字符集编码有关？
+   # MySQL中，限制每一行大小为 65535 字节。不论存储引擎是什么。latin1中一个字符为一个字节
+   
+   mysql> CREATE TABLE t (a VARCHAR(65535) NOT NULL) ENGINE=InnoDB CHARACTER SET latin1;
+   1118 - Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+   
+   mysql> CREATE TABLE t (a VARCHAR(65534) NOT NULL) ENGINE=InnoDB CHARACTER SET latin1;
+   1118 - Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+   
+   mysql> CREATE TABLE t (a VARCHAR(65533) NOT NULL) ENGINE=InnoDB CHARACTER SET latin1;
+   Query OK, 0 rows affected (0.04 sec)
+   
+   # 请注意，以上的字符集是 latin1，为什么不用utf-8? 因为每个字符最大可占用3个字节，行最大长度为65535字节，那么该列可设置的最大列大小为65535 ÷ 3 ≈ 21844（向下取整）
+   mysql> CREATE TABLE tT (a VARCHAR(65535) NOT NULL) ENGINE=InnoDB CHARACTER SET utf8;
+   1074 - Column length too big for column 'a' (max = 21845); use BLOB or TEXT instead
+   
+   mysql> CREATE TABLE tT (a VARCHAR(21845) NOT NULL) ENGINE=InnoDB CHARACTER SET utf8;
+   1118 - Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+   
+   mysql> CREATE TABLE tT (a VARCHAR(21844) NOT NULL) ENGINE=InnoDB CHARACTER SET utf8;
+   Query OK, 0 rows affected (0.03 sec)
+   
+   # 请注意，以上列全部为 NOT NULL，如果列不指定 NOT NULL，则再需要一个字节来存储该列是否为null ！！！
+   # 假设一张表中存在N个可空字段，NULL标识位需要⌈ N / 8 ⌉ \lceil{N/8}\rceil⌈N/8⌉ （向上取整）个字节。此时整行可用于数据存储的空间只有65535 − ⌈ N / 8 ⌉ 65535 - \lceil{N/8}\rceil65535−⌈N/8⌉个字节。
+   ```
+
+   更多关于空间、行大小限制，查看[这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/MySQL%E4%BC%98%E5%8C%96%E2%80%94%E2%80%94%E8%A1%8C%E5%A4%A7%E5%B0%8F%E8%A2%AB%E9%99%90%E5%88%B6%E7%9A%84%E4%BE%8B%E5%AD%90.md)
+
+5. 稳定性 - 会不会拆开存储：
+
+   - VARCHAR：由于是变长，导致更新之后，可能会比以前更长。超过一定字节后，称为“溢出”，InnoDB不同的行格式会有不同的处理机制。`Compact`和`Reduntant`只保存前786多字节，然后用20字节的指针指向溢出的数据页。
+   - CHAR：最大长度只能是 255。否则会报错
+     `1074 - Column length too big for column 'b' (max = 255); use BLOB or TEXT instead`
+
+   详细可参考[这里](https://github.com/zhangyachen/zhangyachen.github.io/issues/96)
+
+6. varchar一定是按照真实数据存储的大小吗？
+   在MySQL8.0之前，内存临时表的存储引擎使用的是 MEMORY，而MEMORY存储引擎只支持定长字符串。故sql在执行过程中需要内存临时表来排序、储存临时结果或其他操作时，给定的 VARCHAR 多大，就需要分配多大的空间。这点非常重要。故 VARCHAR 大小需要仔细考量。
+
+> 这道题的答案主要采自《高性能MySQL 第三版》和 [这里](https://learn.blog.csdn.net/article/details/103341778)，作为延伸阅读，感兴趣可以阅读一下~
+
+---
+
+## 6.BLOB 和 TEXT 有什么不好的地方？该怎么解决？
 
 # （三）索引方面的问题
 
