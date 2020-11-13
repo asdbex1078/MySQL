@@ -18,7 +18,7 @@
   * [3\.谈一下数据库的三大范式？为什么需要反范式？](#3%E8%B0%88%E4%B8%80%E4%B8%8B%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E4%B8%89%E5%A4%A7%E8%8C%83%E5%BC%8F%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%8F%8D%E8%8C%83%E5%BC%8F)
   * [4\.MySQL中字段有哪些类型？](#4mysql%E4%B8%AD%E5%AD%97%E6%AE%B5%E6%9C%89%E5%93%AA%E4%BA%9B%E7%B1%BB%E5%9E%8B)
   * [5\.VARCHAR 和 CHAR有什么区别？除了空格的差异还有其他吗？](#5varchar-%E5%92%8C-char%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%E9%99%A4%E4%BA%86%E7%A9%BA%E6%A0%BC%E7%9A%84%E5%B7%AE%E5%BC%82%E8%BF%98%E6%9C%89%E5%85%B6%E4%BB%96%E5%90%97)
-  * [6\.BLOB 和 TEXT 有什么不好的地方？该怎么解决？——未完](#6blob-%E5%92%8C-text-%E6%9C%89%E4%BB%80%E4%B9%88%E4%B8%8D%E5%A5%BD%E7%9A%84%E5%9C%B0%E6%96%B9%E8%AF%A5%E6%80%8E%E4%B9%88%E8%A7%A3%E5%86%B3%E6%9C%AA%E5%AE%8C)
+  * [6\.BLOB 和 TEXT 有什么不好的地方？该怎么解决？](#6blob-%E5%92%8C-text-%E6%9C%89%E4%BB%80%E4%B9%88%E4%B8%8D%E5%A5%BD%E7%9A%84%E5%9C%B0%E6%96%B9%E8%AF%A5%E6%80%8E%E4%B9%88%E8%A7%A3%E5%86%B3)
   * [7\. TIMESTAMP和DATETIME有什么区别？——未完](#7-timestamp%E5%92%8Cdatetime%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%E6%9C%AA%E5%AE%8C)
   * [8\. MySQL中，一个数据页只有16K，当一个字段特别大，超过16K了，怎么存储？——未完](#8-mysql%E4%B8%AD%E4%B8%80%E4%B8%AA%E6%95%B0%E6%8D%AE%E9%A1%B5%E5%8F%AA%E6%9C%8916k%E5%BD%93%E4%B8%80%E4%B8%AA%E5%AD%97%E6%AE%B5%E7%89%B9%E5%88%AB%E5%A4%A7%E8%B6%85%E8%BF%8716k%E4%BA%86%E6%80%8E%E4%B9%88%E5%AD%98%E5%82%A8%E6%9C%AA%E5%AE%8C)
   * [9\. 为什么要尽量设定一个主键?——未完](#9-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%B0%BD%E9%87%8F%E8%AE%BE%E5%AE%9A%E4%B8%80%E4%B8%AA%E4%B8%BB%E9%94%AE%E6%9C%AA%E5%AE%8C)
@@ -848,7 +848,58 @@ performance_schema实现机制遵循以下设计目标：
 
 ---
 
-## 6.BLOB 和 TEXT 有什么不好的地方？该怎么解决？——未完
+## 6.BLOB 和 TEXT 有什么不好的地方？该怎么解决？
+
+BLOB 和 TEXT 是为了存储很大的数据而设计的字符串类型。其中 BLOB 是二进制的，TEXT 是字符方式的。
+
+“不太好”的地方：
+
+1. 存储方式：
+   	当 BLOB TEXT值太大的时候，InnoDB会找专门的“外部”存储区域进行存储，行内需要1~4个字节的指针，指向真实数据位置。这点类似于很大的 VARCHAR .
+
+2. 排序方面：
+
+   - BLOB 不能进行排序，没有字符集。
+
+   - TEXT 可以排序，但不能对全部内容进行排序，只能排序指定的前几个字符。或者使用 ORDER BY SUBSTRING(cloum, length)
+
+     ```sql
+     mysql> show variables like 'max_sort_length';
+     +-----------------+-------+
+     | Variable_name   | Value |
+     +-----------------+-------+
+     | max_sort_length | 1024  |
+     +-----------------+-------+
+     1 row in set (0.03 sec)
+     ```
+
+3. 建立索引方面：
+    都不能对全部长度的字符串建立索引。
+
+4. 最重要的一点：性能损耗
+   在MySQL8.0以前，内存中的临时表，用的是 MEMORY 存储引擎。但是 MEMORY 存储引擎不支持 BLOB 和 TEXT ，导致即使BLOB 和 TEXT 字段长度不大，内存中足以放得下临时数据，但MySQL一定会选择在磁盘建临时表。这会造成很大的内存损耗。
+
+   ```sql
+   mysql> show variables like 'max_heap_table_size';
+   +---------------------+----------+
+   | Variable_name       | Value    |
+   +---------------------+----------+
+   | max_heap_table_size | 16777216 |
+   +---------------------+----------+
+   1 row in set (0.03 sec)
+   
+   mysql> show variables like 'tmp_table_size';
+   +----------------+----------+
+   | Variable_name  | Value    |
+   +----------------+----------+
+   | tmp_table_size | 46137344 |
+   +----------------+----------+
+   1 row in set (0.03 sec)
+   ```
+
+   解决方案：使用 SUBSTRING(cloum, length)截取，转化为字符串，就可以在内存中建表。但是也得在规定的内存临时表大小范围内。
+
+> 该问题来源，参考自：《高性能MySQL 第三版》
 
 ---
 
