@@ -20,7 +20,7 @@
   * [5\.VARCHAR 和 CHAR有什么区别？除了空格的差异还有其他吗？](#5varchar-%E5%92%8C-char%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%E9%99%A4%E4%BA%86%E7%A9%BA%E6%A0%BC%E7%9A%84%E5%B7%AE%E5%BC%82%E8%BF%98%E6%9C%89%E5%85%B6%E4%BB%96%E5%90%97)
   * [6\.BLOB 和 TEXT 有什么不好的地方？该怎么解决？](#6blob-%E5%92%8C-text-%E6%9C%89%E4%BB%80%E4%B9%88%E4%B8%8D%E5%A5%BD%E7%9A%84%E5%9C%B0%E6%96%B9%E8%AF%A5%E6%80%8E%E4%B9%88%E8%A7%A3%E5%86%B3)
   * [7\. TIMESTAMP和DATETIME有什么区别？——未完](#7-timestamp%E5%92%8Cdatetime%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%E6%9C%AA%E5%AE%8C)
-  * [8\. MySQL中，一个数据页只有16K，当一个字段特别大，超过16K了，怎么存储？——未完](#8-mysql%E4%B8%AD%E4%B8%80%E4%B8%AA%E6%95%B0%E6%8D%AE%E9%A1%B5%E5%8F%AA%E6%9C%8916k%E5%BD%93%E4%B8%80%E4%B8%AA%E5%AD%97%E6%AE%B5%E7%89%B9%E5%88%AB%E5%A4%A7%E8%B6%85%E8%BF%8716k%E4%BA%86%E6%80%8E%E4%B9%88%E5%AD%98%E5%82%A8%E6%9C%AA%E5%AE%8C)
+  * [8\. MySQL中，一个数据页只有16K，当一个字段特别大，超过16K了，怎么存储？](#8-mysql%E4%B8%AD%E4%B8%80%E4%B8%AA%E6%95%B0%E6%8D%AE%E9%A1%B5%E5%8F%AA%E6%9C%8916k%E5%BD%93%E4%B8%80%E4%B8%AA%E5%AD%97%E6%AE%B5%E7%89%B9%E5%88%AB%E5%A4%A7%E8%B6%85%E8%BF%8716k%E4%BA%86%E6%80%8E%E4%B9%88%E5%AD%98%E5%82%A8%E6%9C%AA%E5%AE%8C)
   * [9\. 为什么要尽量设定一个主键?——未完](#9-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%B0%BD%E9%87%8F%E8%AE%BE%E5%AE%9A%E4%B8%80%E4%B8%AA%E4%B8%BB%E9%94%AE%E6%9C%AA%E5%AE%8C)
   * [10\. 主键选用什么类型？使用自增ID还是UUID?——未完](#10-%E4%B8%BB%E9%94%AE%E9%80%89%E7%94%A8%E4%BB%80%E4%B9%88%E7%B1%BB%E5%9E%8B%E4%BD%BF%E7%94%A8%E8%87%AA%E5%A2%9Eid%E8%BF%98%E6%98%AFuuid%E6%9C%AA%E5%AE%8C)
   * [11\. 字段为什么要求定义为not null?——未完](#11-%E5%AD%97%E6%AE%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%B1%82%E5%AE%9A%E4%B9%89%E4%B8%BAnot-null%E6%9C%AA%E5%AE%8C)
@@ -909,9 +909,90 @@ BLOB 和 TEXT 是为了存储很大的数据而设计的字符串类型。其中
 
 ---
 
-## 8. MySQL中，一个数据页只有16K，当一个字段特别大，超过16K了，怎么存储？——未完
+## 8. MySQL中，一个数据页只有16K，当一个字段特别大，超过16K了，怎么存储？
 
-数据行格式，比如COM.....会保存前700多字节的前缀，然后剩余的放在其他地方
+**VARCHAR(M)最多能存储的数据**
+
+我们知道对于`VARCHAR(M)`类型的列最多可以占用`65535`个字节。其中的`M`代表该类型最多存储的字符数量，如果我们使用`ascii`字符集的话，一个字符就代表一个字节，我们看看`VARCHAR(65535)`是否可用：
+
+```sql
+mysql> CREATE TABLE varchar_size_demo(
+    ->     c VARCHAR(65535)
+    -> ) CHARSET=ascii ROW_FORMAT=Compact;
+ERROR 1118 (42000): Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+mysql>
+```
+
+从报错信息里可以看出，`MySQL`对一条记录占用的最大存储空间是有限制的，除了`BLOB`或者`TEXT`类型的列之外，其他所有的列（不包括隐藏列和记录头信息）占用的字节长度加起来不能超过`65535`个字节。所以`MySQL`服务器建议我们把存储类型改为`TEXT`或者`BLOB`的类型。这个`65535`个字节除了列本身的数据之外，还包括一些`storage overhead`，比如说我们为了存储一个`VARCHAR(M)`类型的列，需要占用3部分存储空间：
+
+- 真实数据
+- 真实数据占用字节的长度
+- `NULL`值标识，如果该列有`NOT NULL`属性则可以没有这部分存储空间
+
+如果该`VARCHAR`类型的列没有`NOT NULL`属性，那最多只能存储`65532`个字节的数据，因为真实数据的长度需要占用2个字节，`NULL`值标识需要占用1个字节：
+
+```sql
+mysql> CREATE TABLE varchar_size_demo(
+    ->      c VARCHAR(65532)
+    -> ) CHARSET=ascii ROW_FORMAT=Compact;
+Query OK, 0 rows affected (0.02 sec)
+```
+
+如果`VARCHAR`类型的列有`NOT NULL`属性，那最多只能存储`65533`个字节的数据，因为真实数据的长度需要占用2个字节，不需要`NULL`值标识：
+
+```sql
+mysql> DROP TABLE varchar_size_demo;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE varchar_size_demo(
+    ->      c VARCHAR(65533) NOT NULL
+    -> ) CHARSET=ascii ROW_FORMAT=Compact;
+Query OK, 0 rows affected (0.02 sec)
+```
+
+如果`VARCHAR(M)`类型的列使用的不是`ascii`字符集，那会怎么样呢？来看一下：
+
+```sql
+mysql> DROP TABLE varchar_size_demo;
+Query OK, 0 rows affected (0.00 sec)
+mysql> CREATE TABLE varchar_size_demo(
+    ->       c VARCHAR(65532)
+    -> ) CHARSET=gbk ROW_FORMAT=Compact;
+ERROR 1074 (42000): Column length too big for column 'c' (max = 32767); use BLOB or TEXT instead
+
+mysql> CREATE TABLE varchar_size_demo(
+    ->       c VARCHAR(65532)
+    -> ) CHARSET=utf8 ROW_FORMAT=Compact;
+ERROR 1074 (42000): Column length too big for column 'c' (max = 21845); use BLOB or TEXT instead
+```
+
+从执行结果中可以看出，如果`VARCHAR(M)`类型的列使用的不是`ascii`字符集，那`M`的最大取值取决于该字符集表示一个字符最多需要的字节数。比方说`gbk`字符集表示一个字符最多需要`2`个字节，那在该字符集下，`M`的最大取值就是`32767`，也就是说最多能存储`32767`个字符；`utf8`字符集表示一个字符最多需要`3`个字节，那在该字符集下，`M`的最大取值就是`21845`，也就是说最多能存储`21845`个字符。
+
+##### 记录中的数据太多产生的溢出
+
+我们以`ascii`字符集下的`varchar_size_demo`表为例，插入一条记录：
+
+```sql
+mysql> CREATE TABLE varchar_size_demo(
+    ->       c VARCHAR(65532)
+    -> ) CHARSET=ascii ROW_FORMAT=Compact;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> INSERT INTO varchar_size_demo(c) VALUES(REPEAT('a', 65532));
+Query OK, 1 row affected (0.00 sec)
+```
+
+其中的`REPEAT('a', 65532)`是一个函数调用，它表示生成一个把字符`'a'`重复`65532`次的字符串。前边说过，`MySQL`中磁盘和内存交互的基本单位是`页`，也就是说`MySQL`是以`页`为基本单位来管理存储空间的，我们的记录都会被分配到某个`页`中存储。而一个页的大小一般是`16KB`，也就是`16384`字节，而一个`VARCHAR(M)`类型的列就最多可以存储`65532`个字节，这样就可能造成一个页存放不了一条记录的尴尬情况。
+
+在`Compact`和`Reduntant`行格式中，对于占用存储空间非常大的列，在`记录的真实数据`处只会存储该列的一部分数据，把剩余的数据分散存储在几个连续的页中，只在`记录的真实数据`处用20个字节存储指向这些页的地址，从而可以找到剩余数据所在的页，如图所示：
+
+![1.3.22.行溢出1.png](../mysql-image/1.3.22.行溢出1.png)
+
+从图中可以看出来，对于`Compact`和`Reduntant`行格式来说，如果某一列中的数据非常多的话，在本记录的真实数据处只会存储该列的前`786`个字节的数据和一个指向其他页的地址，然后把剩下的数据存放到其他页中，这个过程也叫做`行溢出`。画一个简图就是这样：
+
+![1.3.23.行溢出2.png](../mysql-image/1.3.23.行溢出2.png)
+
+不只是 ***VARCHAR(M)*** 类型的列，其他的 ***TEXT***、***BLOB*** 类型的列在存储数据非常多的时候也会发生`行溢出`。
 
 ---
 
