@@ -905,6 +905,8 @@ BLOB 和 TEXT 是为了存储很大的数据而设计的字符串类型。其中
 
 ## 7. TIMESTAMP和DATETIME有什么区别？——未完
 
+
+
 ---
 
 ## 8. MySQL中，一个数据页只有16K，当一个字段特别大，超过16K了，怎么存储？——未完
@@ -967,7 +969,21 @@ BNL
 
 ## 8. union 和 union all的区别？——未完
 
+---
 
+## 9.一些有趣的问题
+
+### (1) select sid from sc where score < 60 group by sid;  与 select distinct sid from sc where score < 60; 相比性能如何？
+
+id主键，score无索引；
+id主键，score有索引，可以走索引；
+id主键，score有索引，索引失效；
+id非主键无索引，score无索引；
+id非主键无索引，score有索引，可以走索引；
+id非主键无索引，score有索引，索引失效；
+id非主键有索引，score无索引；
+id非主键有索引，score有索引，可以走索引；
+id非主键有索引，score有索引，索引失效；
 
 ---
 
@@ -1236,9 +1252,16 @@ Change Buffer中的 Insert Buffer，针对非唯一索引做出的优化，随�
 ## 2.事务提交时，redo log和binlog的写入顺序是怎样的——未完
 ## 3.redo log什么时候释放？undo log什么时候释放？——未完
 ## 4.什么是write-Ahead Log策略？——未完
+
 ## 5.bin log记录日志有哪些方式？常用哪种？为什么？各有什么优劣势？——未完
 
 ## 6.关心过业务系统里面的sql耗时吗?统计过慢查询吗?对慢查询都怎么优化过?——未完
+
+## 7.总结一下 bin-log 和 redo-log 的刷脏参数？
+
+## 8.聊一下 WAL 策略？
+
+
 
 ---
 
