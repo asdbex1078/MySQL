@@ -37,7 +37,7 @@
 
 以一个具体表为例：
 `mysql> show index from user1;`
-![索引——show index from table.png](../mysql-image/索引——show index from table.png)
+![索引——show index from table.png](../mysql-image/索引——show%20index%20from%20table.png)
 
 > 大概解读：
 >
