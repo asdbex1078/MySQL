@@ -1375,14 +1375,42 @@ Change Buffer中的 Insert Buffer，针对非唯一索引做出的优化，随�
 
 
 
-## 5.什么是页？怎么理解页？——未完
+## 5.什么是页？怎么理解页？
 
-一般情况下，页的大小为16K，压缩页可以达到2K、4K、8K
-页是怎么存储的？
-为什么一个页中，至少要有 1/32 的剩余空间？
-InnoDB每次将数据所在的页16K，加载到缓冲池中，怎么从数据页中获取到最终结果？循环遍历16K？
+**（1）什么是页？**
+
+页是Innodb存储的**最基本结构**，也是Innodb磁盘管理的最小单位，与数据库相关的所有内容都存储在页结构里。
+
+**（2）页的分类**
+
+页分为几种类型：**数据页（B-Tree Node），Undo页（Undo Log Page），系统页（System Page），事务数据页（Transaction System Page）**等；每个数据页的大小为16kb，每个页使用一个32位（一位表示的就是0或1）的int值来表示，正好对应Innodb最大64TB的存储容量(16kb * 2^32=64tib)，故innodb最大可存64TB数据。
+
+**（3）举例**
+
+拿一颗三阶 B+树 解释什么是数据页：**每一个节点都是一个页**。
+
+![image-20210115090843130](../mysql-image/三阶B+树.png)
+
+即 如下图所示：
+
+![image-20210115091352101](../mysql-image/三阶B+树中的页.png)
+
+每次读取数据时，都会抓取一页放到内存中！
+
+> 页内结构详细参考这篇文章，建议看懂：[InnoDB逻辑存储结构](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.3.0.InnoDB%E7%A3%81%E7%9B%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84.md#innodb%E9%A1%B5%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
+>
+> 关于 InnoDB缓冲池 的介绍中也涉及到了“页”：[InnoDB缓冲池](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.2.0.InnoDB%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E7%BC%93%E5%86%B2%E6%B1%A0.md#%E7%BC%93%E5%86%B2%E6%B1%A0)
+
+**（4）额外知识点**
+
+- 默认情况下，页的大小为16K，但是压缩页可以达到2K、4K、8K。关于压缩页，参考[官网InnoDB页面压缩](https://dev.mysql.com/doc/refman/5.7/en/innodb-page-compression.html)
+- 为什么一个页中，至少要有 1/32 的剩余空间？
+  答案：按照一般情况来说，一页为16K，16 * 1024 / 32 = 512 B。从磁盘的物理结构来看存取信息的最小单位是扇区，一个扇区大小为 512 B.
+- InnoDB每次将数据所在的页16K，加载到缓冲池中，怎么从数据页中获取到最终结果？循环遍历16K？
+  答案：循环遍历16K的数据肯定性能很差。数据存入页中时，会将数据分组，抽出关键的几个数值，放到槽里。当此16k的数据页加载到缓冲池中时，对槽进行二分查找便可快速找到最终需要的数据。详细解释点击这里：[InnoDB逻辑存储结构](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.3.0.InnoDB%E7%A3%81%E7%9B%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84.md#%E9%A1%B5%E7%9A%84%E7%BB%93%E6%9E%84)
 
 ## 6.怎么查看 InnoDB 状态？能看到什么信息？——未完
+
 ## 7.聊一下伙伴内存分配系统——未完
 
 ## 8.聊一下InnoDB的关键特性——未完
