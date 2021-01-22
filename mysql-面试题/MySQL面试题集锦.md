@@ -34,7 +34,7 @@
   * [5\. 超大分页怎么处理?——未完](#5-%E8%B6%85%E5%A4%A7%E5%88%86%E9%A1%B5%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%E6%9C%AA%E5%AE%8C)
   * [6\.如何优化子查询？——未完](#6%E5%A6%82%E4%BD%95%E4%BC%98%E5%8C%96%E5%AD%90%E6%9F%A5%E8%AF%A2%E6%9C%AA%E5%AE%8C)
   * [7\. MySQL是如何如何优化连表查询？——未完](#7-mysql%E6%98%AF%E5%A6%82%E4%BD%95%E5%A6%82%E4%BD%95%E4%BC%98%E5%8C%96%E8%BF%9E%E8%A1%A8%E6%9F%A5%E8%AF%A2%E6%9C%AA%E5%AE%8C)
-  * [8\. union 和 union all的区别？——未完](#8-union-%E5%92%8C-union-all%E7%9A%84%E5%8C%BA%E5%88%AB%E6%9C%AA%E5%AE%8C)
+  * [8\. union 和 union all的区别？](#8-union-%E5%92%8C-union-all%E7%9A%84%E5%8C%BA%E5%88%AB)
   * [9\.一些有趣的问题](#9%E4%B8%80%E4%BA%9B%E6%9C%89%E8%B6%A3%E7%9A%84%E9%97%AE%E9%A2%98)
     * [(1) select sid from sc where score &lt; 60 group by sid;  与 select distinct sid from sc where score &lt; 60; 相比性能如何？](#1-select-sid-from-sc-where-score--60-group-by-sid--%E4%B8%8E-select-distinct-sid-from-sc-where-score--60-%E7%9B%B8%E6%AF%94%E6%80%A7%E8%83%BD%E5%A6%82%E4%BD%95)
 * [（四）索引方面的问题](#%E5%9B%9B%E7%B4%A2%E5%BC%95%E6%96%B9%E9%9D%A2%E7%9A%84%E9%97%AE%E9%A2%98)
@@ -1053,11 +1053,61 @@ BNL
 
 ---
 
-## 8. union 和 union all的区别？——未完
+## 8. 怎么优化 union 查询？
+
+MySQL在执行union查询的时候，会创建临时表，并往临时表里填充数据，因此很多优化策略在union查询中都没法很好的使用。**经常需要手工的将where、limit、order by等子句下推到各个子查询中，以便优化器可以充分利用这些条件进行优化。**
+
+```sql
+(select user_name,user_province,user_sex from user1 where user_age = 12)
+union
+(select user_name,user_province,user_sex from user2 where user_age = 12) limit 20;
+```
+
+例如，以上sql，这个sql会把 user1中 符合条件的所有数据，和 user2 中符合条件的所有数据，存放在一个临时表中，再从临时表中取出前20条。性能可想而知。
+
+优化方案就是将 limit 条件下推到子查询中：
+
+```sql
+(select user_name,user_province,user_sex from user1 where user_age = 12 limit 20)
+union
+(select user_name,user_province,user_sex from user2 where user_age = 12 limit 20) limit 20;
+```
+
+这样一来，临时表中就只有40条数据，然后再取前20条。
+
+但是，临时表中的数据是从两个表中获取的，可能取出数据时顺序不一致，此时 在最外层 order by 一下即可(但是又增加了排序的性能问题)。
+
+```sql
+(select user_name,user_province,user_sex from user1 where user_age = 12 limit 20)
+union
+(select user_name,user_province,user_sex from user2 where user_age = 12 limit 20) order by user_name limit 20;
+```
+
+> 该题和答案采自《高性能MySQL 第三版》
 
 ---
 
-## 9.一些有趣的问题
+## 9.union 和 union all的区别？
+
+union 和 union all 区别就是union all 中的结果会重复，union的结果不会重复。
+
+union 语句的执行计划如下：
+
+![image-20210122093446294](../mysql-image/面试题——unionAll1.png)
+
+union all 语句的执行计划如下：
+
+![image-20210122093638470](../mysql-image/面试题——unionAll2.png)
+
+可以很明显的看到，union 查询多了一个对临时表进行去重的过程。
+
+故，除非确实需要服务器消除重复的行，否则一定要使用union all，因此没有all关键字，mysql会在查询的时候给临时表加上distinct的关键字，这个操作的代价很高。
+
+建议使用 union all，可以考虑去程序中去重。
+
+---
+
+## 10.一些有趣的问题
 
 ### (1) select sid from sc where score < 60 group by sid;  与 select distinct sid from sc where score < 60; 相比性能如何？
 
@@ -1306,7 +1356,9 @@ Change Buffer中的 Insert Buffer，针对非唯一索引做出的优化，随�
 
 ## 2. order by排序有哪两种算法？——未完
 
-排序两种算法，两次传输排序和单次传输排序。order by时，尽量使用第一张表的字段进行排序，性能不一样，explain不一样，不是第一张表的会多一个使用临时表
+排序两种算法，两次传输排序和单次传输排序。order by时，尽量使用第一张表的字段进行排序，性能不一样，explain不一样，不是第一张表的会多一个使用临时表。
+
+
 
 ---
 
