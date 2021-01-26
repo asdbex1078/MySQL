@@ -22,10 +22,14 @@
 5. 输出追踪信息到文件
    	
    ```sql
-SELECT TRACE INTO DUMPFILE "/var/lib/mysql-files//test.trace" FROM INFORMATION_SCHEMA.OPTIMIZER_TRACE;
+SELECT TRACE INTO DUMPFILE "路径/文件名.trace" FROM INFORMATION_SCHEMA.OPTIMIZER_TRACE;
 	```
 	
 	   	(注意：此处需要是 / 并且，输出的目录需要留心)
+	
+	
+	
+	
 	
 	①、可能会遇到如下问题：
 	
