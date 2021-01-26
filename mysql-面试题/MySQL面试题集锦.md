@@ -29,8 +29,8 @@
 * [（三）SQL语句方面的问题](#%E4%B8%89sql%E8%AF%AD%E5%8F%A5%E6%96%B9%E9%9D%A2%E7%9A%84%E9%97%AE%E9%A2%98)
   * [1\. ALTER TABLE 会有什么影响？有没有解决办法？——未完](#1-alter-table-%E4%BC%9A%E6%9C%89%E4%BB%80%E4%B9%88%E5%BD%B1%E5%93%8D%E6%9C%89%E6%B2%A1%E6%9C%89%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%E6%9C%AA%E5%AE%8C)
   * [2\. 怎么优化 order by 、group by？——未完](#2-%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96-order-by-group-by%E6%9C%AA%E5%AE%8C)
-  * [3\.  select \* from A group by a desc; 这么写对吗？为什么？——未完](#3--select--from-a-group-by-a-desc-%E8%BF%99%E4%B9%88%E5%86%99%E5%AF%B9%E5%90%97%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%AA%E5%AE%8C)
-  * [4\. 怎么理解“延迟关联”？（怎么优化limit？）——未完](#4-%E6%80%8E%E4%B9%88%E7%90%86%E8%A7%A3%E5%BB%B6%E8%BF%9F%E5%85%B3%E8%81%94%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96limit%E6%9C%AA%E5%AE%8C)
+  * [3\.  select \* from A group by a desc; 这么写对吗？为什么？](#3--select--from-a-group-by-a-desc-%E8%BF%99%E4%B9%88%E5%86%99%E5%AF%B9%E5%90%97%E4%B8%BA%E4%BB%80%E4%B9%88)
+  * [4\. 怎么理解“延迟关联”？（怎么优化limit？）](#4-%E6%80%8E%E4%B9%88%E7%90%86%E8%A7%A3%E5%BB%B6%E8%BF%9F%E5%85%B3%E8%81%94%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96limit)
   * [5\. 超大分页怎么处理?——未完](#5-%E8%B6%85%E5%A4%A7%E5%88%86%E9%A1%B5%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%E6%9C%AA%E5%AE%8C)
   * [6\.如何优化子查询？——未完](#6%E5%A6%82%E4%BD%95%E4%BC%98%E5%8C%96%E5%AD%90%E6%9F%A5%E8%AF%A2%E6%9C%AA%E5%AE%8C)
   * [7\. MySQL是如何如何优化连表查询？——未完](#7-mysql%E6%98%AF%E5%A6%82%E4%BD%95%E5%A6%82%E4%BD%95%E4%BC%98%E5%8C%96%E8%BF%9E%E8%A1%A8%E6%9F%A5%E8%AF%A2%E6%9C%AA%E5%AE%8C)
@@ -1029,7 +1029,41 @@ Query OK, 1 row affected (0.00 sec)
 
 ---
 
-## 3.  select * from A group by a desc; 这么写对吗？为什么？——未完
+## 3.  select * from A group by a desc; 这么写对吗？为什么？
+
+首先，题目中这个写法是正确的。但，仅限于 MySQL8.0 版本以下。即 8.0 中这种写法是错的。
+
+**首先看MySQL5.7版本中一个普通的 group by 语句**：
+
+![image-20210126091741763](../mysql-image/面试题——三groupby语句.png)
+
+来看一下执行计划：
+
+![image-20210126091932450](../mysql-image/面试题——三groupby语句2.png)
+
+通过 explain 可以发现，Extra 中 Using temporary可以理解，分组需要临时表。但是为什么会有 Using filesort？此时返回去，看第一张图，会发现 user_age 是从小到大排序过的。
+
+原因：MySQL8.0 以下，group by 之后默认会有一个排序的操作（隐式排序），且这个sql没有走索引，所以既需要临时表，又需要文件内排序。由此，可以按照 user_age 降序输出：
+
+![image-20210126092213428](../mysql-image/面试题——三groupby语句3.png)
+
+但是很多时候，分组之后并没有排序的需求，则可以这么优化SQL：后边加一个 order by null
+
+![image-20210126092610170](../mysql-image/面试题——三groupby语句4.png)
+
+来看看执行计划：没有了文件内排序。故此举可以优化一些性能。
+
+![image-20210126092727979](../mysql-image/面试题——三groupby语句5.png)
+
+
+
+**MySQL8.0中，直接报语法错误。因为 8.0 性能作了提升，去掉了隐式排序**
+
+![image-20210126093251261](../mysql-image/面试题——三groupby语句6.png)
+
+所以，如果你曾经写过这中sql，突然升级到 MySQL8.0 会不支持这个语法。修改方案就是明确写明 order by。
+
+![image-20210126093810843](../mysql-image/面试题——三groupby语句7.png)
 
 ---
 
