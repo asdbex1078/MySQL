@@ -1631,16 +1631,15 @@ WHERE
  limit 10;
 ```
 
-建立索引方面，由于主键不明，所以不好定论，如果user表中uid是主键，并且thread表中tid是主键，则只需要给user表加username索引，给thread表中uid加索引即可：
+建立索引方面，由于主键不明，所以不好定论，如果user表中uid是主键，并且thread表中tid是主键，则只需要给user表加username索引，给thread表中uid加索引即可；
 
-- user表：uid和username设立索引
-- thread：tid 和 uid设立索引 
+若uid不是user表的主键，tid不是thread表的主键则，给user表中uid和username设立索引，thread中tid 和 uid设立索引 。
 
 如何确认sql用到了那个索引，从理论上，
 
 1. group by中用到了uid，给thread表uid建立索引可以用到；
 2. 连表查询时，需要给后一张表的字段加索引。所以thread表建uid是对的
-3. 要从user表中查username，需要建立uid + username联合索引
+3. 要从user表中查username，若uid不是主键，则需要建立uid + username联合索引，只需要扫描辅助索引树即可。不需要回表
 4. 如果要确认，需要实际操作，explain查看执行计划
 
 是不是最优解：
