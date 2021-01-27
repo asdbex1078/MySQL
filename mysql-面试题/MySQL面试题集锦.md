@@ -1633,7 +1633,7 @@ WHERE
 
 建立索引方面，由于主键不明，所以不好定论，如果user表中uid是主键，并且thread表中tid是主键，则只需要给user表加username索引，给thread表中uid加索引即可；
 
-若uid不是user表的主键，tid不是thread表的主键则，给user表中uid和username设立索引，thread中tid 和 uid设立索引 。
+若uid不是user表的主键，tid不是thread表的主键则，给user表中uid和username设立联合索引，thread中tid 和 uid设立索引 。
 
 如何确认sql用到了那个索引，从理论上，
 
