@@ -1604,6 +1604,53 @@ InnoDB中，新增了midPoint位置。新读取到的页并没有直接放在LRU
 
 InnoDB为什么在 count(1) 方面不如 MYISAM
 
+
+
+---
+
+# （十一）综合面试题
+
+## 1. 有下面两张表，user(用户表)和thread(帖子表)，假设50W用户，500W帖子，写一条SQL，显示 前10名发帖最多的用户的名字及帖子数量，并针对该语句支出如何设计合理的索引字段。如何确认你写的sql会用到哪个索引，另外请说明你写的sql是否是最优解。
+
+| 表名   | 字段                                  |
+| ------ | ------------------------------------- |
+| user   | uid，username，password，create_time  |
+| thread | tid，uid，title，content，create_time |
+
+```sql
+SELECT
+ u.username,
+ b.count 
+FROM
+USER as u
+inner join ( SELECT count(uid) AS count,uid FROM thread GROUP BY uid ORDER BY count DESC LIMIT 10 ) as b
+WHERE
+ u.uid = b.uid;
+```
+
+建立索引方面，由于主键不明，所以不好定论，如果user表中uid是主键，并且thread表中tid是主键，则只需要给user表加username索引，给thread表中uid加索引即可：
+
+- user表：uid和username设立索引
+- thread：tid 和 uid设立索引 
+
+如何确认sql用到了那个索引，从理论上，
+
+1. group by中用到了uid，给thread表uid建立索引可以用到；
+2. 连表查询时，需要给后一张表的字段加索引。所以thread表建uid是对的
+3. 要从user表中查username，需要建立uid + username联合索引
+4. 如果要确认，需要实际操作，explain查看执行计划
+
+是不是最优解：
+
+需要看目前这个sql执行时间多久，200毫秒以内绝对没问题。肯定有其他写法，需要通过验证才能知道是不是最优。
+
+> 这里面涉及到的知识点：
+>
+> 1. 聚簇索引，非聚簇索引，联合索引的选取，explain的了解，group by的优化，limit，子查询，联表查询等。
+> 2. 并不是一看名字叫 某某id 就把他定性为主键，一定要注意这一个坑，这道题里的坑就是user表的uid 和 thread 表的tid
+>
+> 若有更有sql解法，欢迎联系我~
+
 ---
 
 > 本文主要参考书籍、地址：
