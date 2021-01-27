@@ -1608,7 +1608,7 @@ InnoDB为什么在 count(1) 方面不如 MYISAM
 
 ---
 
-# （十一）综合面试题
+# （十一）笔试题
 
 ## 1. 有下面两张表，user(用户表)和thread(帖子表)，假设50W用户，500W帖子，写一条SQL，显示 前10名发帖最多的用户的名字及帖子数量，并针对该语句支出如何设计合理的索引字段。如何确认你写的sql会用到哪个索引，另外请说明你写的sql是否是最优解。
 
@@ -1618,6 +1618,8 @@ InnoDB为什么在 count(1) 方面不如 MYISAM
 | thread | tid，uid，title，content，create_time |
 
 ```sql
+// 先从thread表中查出10条数据，在内连接user表
+// 这里认为 uid 是user表的主键，tid是thread的主键
 SELECT
  u.username,
  b.count 
@@ -1625,7 +1627,8 @@ FROM
 USER as u
 inner join ( SELECT count(uid) AS count,uid FROM thread GROUP BY uid ORDER BY count DESC LIMIT 10 ) as b
 WHERE
- u.uid = b.uid;
+ u.uid = b.uid
+ limit 10;
 ```
 
 建立索引方面，由于主键不明，所以不好定论，如果user表中uid是主键，并且thread表中tid是主键，则只需要给user表加username索引，给thread表中uid加索引即可：
@@ -1649,7 +1652,17 @@ WHERE
 > 1. 聚簇索引，非聚簇索引，联合索引的选取，explain的了解，group by的优化，limit，子查询，联表查询等。
 > 2. 并不是一看名字叫 某某id 就把他定性为主键，一定要注意这一个坑，这道题里的坑就是user表的uid 和 thread 表的tid
 >
-> 若有更有sql解法，欢迎联系我~
+> 若有更优sql解法，欢迎联系我~
+
+
+
+
+
+
+
+
+
+
 
 ---
 
