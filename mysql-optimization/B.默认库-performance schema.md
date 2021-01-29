@@ -741,7 +741,7 @@ performance_schema_max_sql_text_length=1024
 
 配置表之间存在相互关联关系，按照配置影响的先后顺序，可添加为
 
-![配置表之间存在相互关联关系](../../mysql-image/配置表之间存在相互关联关系.png)
+![配置表之间存在相互关联关系](../mysql-image/配置表之间存在相互关联关系.png)
 
 ```sql
 /*

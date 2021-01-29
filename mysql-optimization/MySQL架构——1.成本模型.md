@@ -151,7 +151,7 @@ FLUSH OPTIMIZER_COSTS;
 
 
 - 根据MySQL架构来区分，分server层和engines层。分别对应两张表：engines_cost 和 server_cost 。
-- 根据介质的不同来计算成本：磁盘 和 内存
+- 根据介质的不同来计算成本：磁盘 和 内存 以及 CPU
 
 server层需要考虑的成本：
 
