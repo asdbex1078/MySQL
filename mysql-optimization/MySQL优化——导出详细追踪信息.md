@@ -45,7 +45,7 @@
    mysql> SET OPTIMIZER_TRACE="enabled=on",END_MARKERS_IN_JSON=on; 
    Query OK, 0 rows affected (0.00 sec)
    
-   -- 属于第二步范畴：打开cmd窗口，开启追踪参数
+   -- 属于第二步范畴：开启追踪参数
    mysql> SET OPTIMIZER_TRACE_MAX_MEM_SIZE=1000000; 
    Query OK, 0 rows affected (0.00 sec)
    
