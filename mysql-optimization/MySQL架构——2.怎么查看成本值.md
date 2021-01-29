@@ -69,10 +69,7 @@ mysql> select count(user_age) from user1 group by user_age;
 
 ```sql
 explain select user_name,user_age from user1 where user_age < 20;
-explain select user_name,user_age from user1 where user_age <= 20;
 ```
-
-（提示：第二个sql中的 等号 起到的作用非同小可）
 
 ## 二、成本值的查看
 

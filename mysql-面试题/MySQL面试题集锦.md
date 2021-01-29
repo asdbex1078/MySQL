@@ -385,7 +385,7 @@ MySQL是基于成本模型的。成本高的不一定执行速度快。
 
 1. [那么什么是成本？什么是成本模型？](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/MySQL%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%94%E6%88%90%E6%9C%AC%E6%A8%A1%E5%9E%8B.md#%E4%BC%98%E5%8C%96%E5%99%A8%E6%88%90%E6%9C%AC%E6%A8%A1%E5%9E%8B)
 
-2. 成本是怎么计算出来的？我该如何查看成本？
+2. [成本是怎么计算出来的？我该如何查看成本？](https://github.com/asdbex1078/MySQL/blob/master/mysql-optimization/MySQL%E6%9E%B6%E6%9E%84%E2%80%94%E2%80%942.%E6%80%8E%E4%B9%88%E6%9F%A5%E7%9C%8B%E6%88%90%E6%9C%AC%E5%80%BC.md)
 
 3. 优化器怎么选取最佳索引的？
 
