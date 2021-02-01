@@ -1216,6 +1216,11 @@ InnoDB 的非聚集索引 和 MYISAM 非聚集索引的区别就是：InnoDB 非
 
 ![聚簇索引和非聚簇索引的对比](../mysql-image/聚簇索引和非聚簇索引的对比.jpg)
 
+> 延伸阅读：
+>
+> 1. [聚簇索引和非聚簇索引](https://aafdc5f3.wiz06.com/wapp/pages/view/share/s/2G_snP1IAAKJ2pDKXw2gROYt05A5Bk2Q8Qet2Wi6kD2p5uhc)
+> 2. [索引覆盖](https://aafdc5f3.wiz06.com/wapp/pages/view/share/s/2G_snP1IAAKJ2pDKXw2gROYt2RqQk-1bTQKI2ZeT_v3NEVhk)
+
 ---
 
 ## 5. 为什么使用索引？不使用索引会怎样？——未完
