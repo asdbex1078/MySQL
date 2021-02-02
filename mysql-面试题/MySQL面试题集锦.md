@@ -78,14 +78,14 @@
   * [5\. 谈一谈InnoDB的MVCC，他是怎么运行的，解决了什么问题？——未完](#5-%E8%B0%88%E4%B8%80%E8%B0%88innodb%E7%9A%84mvcc%E4%BB%96%E6%98%AF%E6%80%8E%E4%B9%88%E8%BF%90%E8%A1%8C%E7%9A%84%E8%A7%A3%E5%86%B3%E4%BA%86%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%E6%9C%AA%E5%AE%8C)
   * [6\. 分布式事务解决方案？——未完](#6-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E6%9C%AA%E5%AE%8C)
 * [（七）日志类问题](#%E4%B8%83%E6%97%A5%E5%BF%97%E7%B1%BB%E9%97%AE%E9%A2%98)
-  * [1\. redo log 和 bin log有什么区别？——未完](#1-redo-log-%E5%92%8C-bin-log%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%E6%9C%AA%E5%AE%8C)
+  * [1\. redo log 和 bin log有什么区别？](#1-redo-log-%E5%92%8C-bin-log%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB)
   * [2\.事务提交时，redo log和binlog的写入顺序是怎样的——未完](#2%E4%BA%8B%E5%8A%A1%E6%8F%90%E4%BA%A4%E6%97%B6redo-log%E5%92%8Cbinlog%E7%9A%84%E5%86%99%E5%85%A5%E9%A1%BA%E5%BA%8F%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84%E6%9C%AA%E5%AE%8C)
   * [3\.redo log什么时候释放？undo log什么时候释放？——未完](#3redo-log%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E9%87%8A%E6%94%BEundo-log%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E9%87%8A%E6%94%BE%E6%9C%AA%E5%AE%8C)
   * [4\.什么是write\-Ahead Log策略？——未完](#4%E4%BB%80%E4%B9%88%E6%98%AFwrite-ahead-log%E7%AD%96%E7%95%A5%E6%9C%AA%E5%AE%8C)
   * [5\.bin log记录日志有哪些方式？常用哪种？为什么？各有什么优劣势？——未完](#5bin-log%E8%AE%B0%E5%BD%95%E6%97%A5%E5%BF%97%E6%9C%89%E5%93%AA%E4%BA%9B%E6%96%B9%E5%BC%8F%E5%B8%B8%E7%94%A8%E5%93%AA%E7%A7%8D%E4%B8%BA%E4%BB%80%E4%B9%88%E5%90%84%E6%9C%89%E4%BB%80%E4%B9%88%E4%BC%98%E5%8A%A3%E5%8A%BF%E6%9C%AA%E5%AE%8C)
   * [6\.关心过业务系统里面的sql耗时吗?统计过慢查询吗?对慢查询都怎么优化过?——未完](#6%E5%85%B3%E5%BF%83%E8%BF%87%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E9%87%8C%E9%9D%A2%E7%9A%84sql%E8%80%97%E6%97%B6%E5%90%97%E7%BB%9F%E8%AE%A1%E8%BF%87%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%90%97%E5%AF%B9%E6%85%A2%E6%9F%A5%E8%AF%A2%E9%83%BD%E6%80%8E%E4%B9%88%E4%BC%98%E5%8C%96%E8%BF%87%E6%9C%AA%E5%AE%8C)
-  * [7\.总结一下 bin\-log 和 redo\-log 的刷脏参数？](#7%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B-bin-log-%E5%92%8C-redo-log-%E7%9A%84%E5%88%B7%E8%84%8F%E5%8F%82%E6%95%B0)
-  * [8\.聊一下 WAL 策略？](#8%E8%81%8A%E4%B8%80%E4%B8%8B-wal-%E7%AD%96%E7%95%A5)
+  * [7\.总结一下 bin\-log 和 redo\-log 的刷脏参数？——未完](#7%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B-bin-log-%E5%92%8C-redo-log-%E7%9A%84%E5%88%B7%E8%84%8F%E5%8F%82%E6%95%B0)
+  * [8\.聊一下 WAL 策略？——未完](#8%E8%81%8A%E4%B8%80%E4%B8%8B-wal-%E7%AD%96%E7%95%A5)
 * [（八）锁问题](#%E5%85%AB%E9%94%81%E9%97%AE%E9%A2%98)
   * [1\. 数据库中有哪些锁，有什么作用，有什么弊端？——未完](#1-%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E6%9C%89%E5%93%AA%E4%BA%9B%E9%94%81%E6%9C%89%E4%BB%80%E4%B9%88%E4%BD%9C%E7%94%A8%E6%9C%89%E4%BB%80%E4%B9%88%E5%BC%8A%E7%AB%AF%E6%9C%AA%E5%AE%8C)
   * [2\.latch 和 lock 有什么区别——未完](#2latch-%E5%92%8C-lock-%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%E6%9C%AA%E5%AE%8C)
@@ -1483,11 +1483,28 @@ Change Buffer中的 Insert Buffer，针对非唯一索引做出的优化，随�
 
 # （七）日志类问题
 
-## 1. redo log 和 bin log有什么区别？——未完
+## 1. redo log 和 bin log有什么区别？
+
+[参考这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.4.6.Mysql%E6%96%87%E4%BB%B6%E2%80%94%E2%80%94bin%20log%E5%92%8Credo%20log%E7%9A%84%E5%8C%BA%E5%88%AB.md#%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6-%E5%92%8C-%E9%87%8D%E5%81%9A%E6%97%A5%E5%BF%97-%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8C%BA%E5%88%AB)
 
 ---
 
-## 2.事务提交时，redo log和binlog的写入顺序是怎样的——未完
+## 2.事务提交时，redo log和binlog的写入顺序是怎样的？
+
+这道题重点是考 **两阶段提交**。
+
+事务开始之后就产生redo log，redo log的落盘并不是随着事务的提交才写入的，而是在事务的执行过程中，便不断写入redo log文件中。一般情况下，innodb_flush_log_at_trx_commit 设置为1，代表每次事务commit时，必须调用 fsync 操作，将重做日志缓冲同步写到磁盘。另外，bin log中 sync_binlog参数设为1，每次事务提交时同步写到磁盘bin log中。 
+
+那么就有了一个谁先谁后的问题：redo log 先，bin log 后。
+
+两阶段提交的内容：**事务提交时，redo log处于 pre状态  -> 写入bin log  -> 事务真正提交。  **
+
+当发生崩溃恢复时，查看的是bin log是否完整，如果bin log完整，则代表事务已经提交。
+
+如果在两阶段提交过程中，bin log写入失败，则事务无法终止提交，崩溃恢复时就不需要重做。如果bin log写完的一瞬间，服务器宕机了，事务都来不及提交，此时bin log并不是完整的，缺少了最终的commit标记。因此也是提交失败。
+
+简单说，redo log和bin log都可以用于表示事务的提交状态，而两阶段提交就是让这两个状态保持逻辑上的一致。
+
 ## 3.redo log什么时候释放？undo log什么时候释放？——未完
 ## 4.什么是write-Ahead Log策略？——未完
 
@@ -1495,9 +1512,9 @@ Change Buffer中的 Insert Buffer，针对非唯一索引做出的优化，随�
 
 ## 6.关心过业务系统里面的sql耗时吗?统计过慢查询吗?对慢查询都怎么优化过?——未完
 
-## 7.总结一下 bin-log 和 redo-log 的刷脏参数？
+## 7.总结一下 bin-log 和 redo-log 的刷脏参数？——未完
 
-## 8.聊一下 WAL 策略？
+## 8.聊一下 WAL 策略？——未完
 
 
 
