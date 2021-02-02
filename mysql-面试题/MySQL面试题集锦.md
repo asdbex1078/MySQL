@@ -100,7 +100,7 @@
 * [（九）InnoDB类问题](#%E4%B9%9Dinnodb%E7%B1%BB%E9%97%AE%E9%A2%98)
   * [1\.什么是缓冲池？有什么用？](#1%E4%BB%80%E4%B9%88%E6%98%AF%E7%BC%93%E5%86%B2%E6%B1%A0%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8)
   * [2\.聊一聊LRU算法，InnoDB是怎么实现LRU的？](#2%E8%81%8A%E4%B8%80%E8%81%8Alru%E7%AE%97%E6%B3%95innodb%E6%98%AF%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0lru%E7%9A%84)
-  * [3\.聊一聊InnoDB架构，各组成部分有什么用？——未完](#3%E8%81%8A%E4%B8%80%E8%81%8Ainnodb%E6%9E%B6%E6%9E%84%E5%90%84%E7%BB%84%E6%88%90%E9%83%A8%E5%88%86%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8%E6%9C%AA%E5%AE%8C)
+  * [3\.聊一聊InnoDB架构，各组成部分有什么用？](#3%E8%81%8A%E4%B8%80%E8%81%8Ainnodb%E6%9E%B6%E6%9E%84%E5%90%84%E7%BB%84%E6%88%90%E9%83%A8%E5%88%86%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8)
   * [4\.脏页刷盘机制是什么？脏页刷盘过程中，服务器或MySQL宕机了怎么办？——未完](#4%E8%84%8F%E9%A1%B5%E5%88%B7%E7%9B%98%E6%9C%BA%E5%88%B6%E6%98%AF%E4%BB%80%E4%B9%88%E8%84%8F%E9%A1%B5%E5%88%B7%E7%9B%98%E8%BF%87%E7%A8%8B%E4%B8%AD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%88%96mysql%E5%AE%95%E6%9C%BA%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E%E6%9C%AA%E5%AE%8C)
   * [5\.什么是页？怎么理解页？](#5%E4%BB%80%E4%B9%88%E6%98%AF%E9%A1%B5%E6%80%8E%E4%B9%88%E7%90%86%E8%A7%A3%E9%A1%B5)
   * [6\.怎么查看 InnoDB 状态？能看到什么信息？——未完](#6%E6%80%8E%E4%B9%88%E6%9F%A5%E7%9C%8B-innodb-%E7%8A%B6%E6%80%81%E8%83%BD%E7%9C%8B%E5%88%B0%E4%BB%80%E4%B9%88%E4%BF%A1%E6%81%AF%E6%9C%AA%E5%AE%8C)
@@ -1541,7 +1541,11 @@ InnoDB中，新增了midPoint位置。新读取到的页并没有直接放在LRU
 
 详细介绍在缓冲池这里已经介绍过。[LRU list](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.2.0.InnoDB%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E7%BC%93%E5%86%B2%E6%B1%A0.md#lru-list)
 
-## 3.聊一聊InnoDB架构，各组成部分有什么用？——未完
+## 3.聊一聊InnoDB架构，各组成部分有什么用？
+
+[InnoDB架构参考这里](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.0.MySQL%E6%9E%B6%E6%9E%84%E5%88%B0innoDB%E6%9E%B6%E6%9E%84.md#innodb)
+
+[InnoDB的关键特性](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.1.1.InnoDB%E2%80%94%E2%80%94%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7.md#innodb%E7%9A%84%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7)
 
 ## 4.脏页刷盘机制是什么？脏页刷盘过程中，服务器或MySQL宕机了怎么办？——未完
 
@@ -1581,7 +1585,185 @@ InnoDB中，新增了midPoint位置。新读取到的页并没有直接放在LRU
 - InnoDB每次将数据所在的页16K，加载到缓冲池中，怎么从数据页中获取到最终结果？循环遍历16K？
   答案：循环遍历16K的数据肯定性能很差。数据存入页中时，会将数据分组，抽出关键的几个数值，放到槽里。当此16k的数据页加载到缓冲池中时，对槽进行二分查找便可快速找到最终需要的数据。详细解释点击这里：[InnoDB逻辑存储结构](https://github.com/asdbex1078/MySQL/blob/master/mysql-storage-engines/innodb/1.3.0.InnoDB%E7%A3%81%E7%9B%98%E7%BB%93%E6%9E%84%E2%80%94%E2%80%94%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84.md#%E9%A1%B5%E7%9A%84%E7%BB%93%E6%9E%84)
 
-## 6.怎么查看 InnoDB 状态？能看到什么信息？——未完
+## 6.怎么查看 InnoDB 状态？能看到什么信息？
+
+```properties
+=====================================
+2022-02-02 08:15:59 0x1b34 INNODB MONITOR OUTPUT
+=====================================
+Per second averages calculated from the last 31 seconds
+-----------------
+BACKGROUND THREAD
+-----------------
+srv_master_thread loops: 187 srv_active, 0 srv_shutdown, 426130 srv_idle
+srv_master_thread log flush and writes: 426317
+----------
+SEMAPHORES
+----------
+OS WAIT ARRAY INFO: reservation count 127
+OS WAIT ARRAY INFO: signal count 121
+RW-shared spins 0, rounds 1701, OS waits 98
+RW-excl spins 0, rounds 34, OS waits 0
+RW-sx spins 1, rounds 22, OS waits 0
+Spin rounds per wait: 1701.00 RW-shared, 34.00 RW-excl, 22.00 RW-sx
+------------------------
+LATEST FOREIGN KEY ERROR
+------------------------
+2021-01-20 13:43:51 0x2d9c Error in foreign key constraint of table testmybatis/emp:
+foreign key (deptno) references dept (deptno)
+ ):
+Cannot resolve table name close to:
+ (deptno)
+ )
+------------
+TRANSACTIONS
+------------
+Trx id counter 1567714
+Purge done for trx's n:o < 1567713 undo n:o < 0 state: running but idle
+History list length 13
+LIST OF TRANSACTIONS FOR EACH SESSION:
+---TRANSACTION 284004297169560, not started
+0 lock struct(s), heap size 1136, 0 row lock(s)
+---TRANSACTION 284004297168688, not started
+0 lock struct(s), heap size 1136, 0 row lock(s)
+--------
+FILE I/O
+--------
+I/O thread 0 state: wait Windows aio (insert buffer thread)
+I/O thread 1 state: wait Windows aio (log thread)
+I/O thread 2 state: wait Windows aio (read thread)
+I/O thread 3 state: wait Windows aio (read thread)
+I/O thread 4 state: wait Windows aio (read thread)
+I/O thread 5 state: wait Windows aio (read thread)
+I/O thread 6 state: wait Windows aio (write thread)
+I/O thread 7 state: wait Windows aio (write thread)
+I/O thread 8 state: wait Windows aio (write thread)
+I/O thread 9 state: wait Windows aio (write thread)
+Pending normal aio reads: [0, 0, 0, 0] , aio writes: [0, 0, 0, 0] ,
+ ibuf aio reads:, log i/o's:, sync i/o's:
+Pending flushes (fsync) log: 0; buffer pool: 0
+87062 OS file reads, 2454 OS file writes, 577 OS fsyncs
+0.00 reads/s, 0 avg bytes/read, 0.84 writes/s, 0.00 fsyncs/s
+-------------------------------------
+INSERT BUFFER AND ADAPTIVE HASH INDEX
+-------------------------------------
+Ibuf: size 1, free list len 203, seg size 205, 0 merges
+merged operations:
+ insert 0, delete mark 0, delete 0
+discarded operations:
+ insert 0, delete mark 0, delete 0
+Hash table size 2267, node heap has 0 buffer(s)
+Hash table size 2267, node heap has 0 buffer(s)
+Hash table size 2267, node heap has 0 buffer(s)
+Hash table size 2267, node heap has 0 buffer(s)
+Hash table size 2267, node heap has 0 buffer(s)
+Hash table size 2267, node heap has 0 buffer(s)
+Hash table size 2267, node heap has 0 buffer(s)
+Hash table size 2267, node heap has 1 buffer(s)
+0.00 hash searches/s, 0.00 non-hash searches/s
+---
+LOG
+---
+Log sequence number 2461771042
+Log flushed up to   2461771042
+Pages flushed up to 2461771042
+Last checkpoint at  2461771033
+0 pending log flushes, 0 pending chkp writes
+271 log i/o's done, 0.00 log i/o's/second
+----------------------
+BUFFER POOL AND MEMORY
+----------------------
+Total large memory allocated 8585216
+Dictionary memory allocated 495865
+Buffer pool size   512
+Free buffers       255
+Database pages     256
+Old database pages 0
+Modified db pages  0
+Pending reads      0
+Pending writes: LRU 0, flush list 0, single page 0
+Pages made young 0, not young 0
+0.00 youngs/s, 0.00 non-youngs/s
+Pages read 86714, created 726, written 1927
+0.00 reads/s, 0.74 creates/s, 0.84 writes/s
+Buffer pool hit rate 1000 / 1000, young-making rate 0 / 1000 not 0 / 1000
+Pages read ahead 0.00/s, evicted without access 0.00/s, Random read ahead 0.00/s
+LRU len: 256, unzip_LRU len: 0
+I/O sum[26]:cur[0], unzip sum[0]:cur[0]
+--------------
+ROW OPERATIONS
+--------------
+0 queries inside InnoDB, 0 queries in queue
+0 read views open inside InnoDB
+Process ID=4616, Main thread ID=7112, state: sleeping
+Number of rows inserted 27238, updated 15, deleted 22, read 41698497
+26.45 inserts/s, 0.00 updates/s, 0.00 deletes/s, 36.58 reads/s
+----------------------------
+END OF INNODB MONITOR OUTPUT
+============================
+```
+
+
+**第一种方式：show engine innodb status**
+
+- Status：显示时间戳、监视器名称和平均每秒所基于的秒数。秒数是指从当前时间到InnoDB监视器输出最后一次打印之间经过的时间。
+
+- BACKGROUND THREAD：srv_master_thread行显示了主后台线程所完成的工作。
+
+- SEMAPHORES：等待信号量的线程，以及关于线程需要旋转或等待互斥锁或rwlock信号量的统计数据。大量等待信号量的线程可能是由于磁盘I/O或InnoDB内部的争用问题造成的。争用可能是由于查询的高度并行性或操作系统线程调度中的问题。在这种情况下，将innodb_thread_concurrency系统变量设置为小于默认值可能会有所帮助。每个等待行的自旋轮数显示了每个操作系统等待互斥的自旋锁轮数。
+  Mutex信息由 SHOW ENGINE INNODB MUTEX; 查看。
+
+- LATEST FOREIGN KEY ERROR：提供关于最近的外键约束错误的信息。如果没有这样的错误发生就没有这一项。内容包括失败的语句，以及关于失败的约束以及被引用和正在引用的表的信息。
+
+- **LATEST DETECTED DEADLOCK：提供关于最近死锁的信息。如果没有死锁发生，它就不存在。内容显示了涉及哪些事务，每个事务都试图执行的语句，它们拥有和需要的锁，以及InnoDB决定回滚哪个事务来打破死锁。**
+
+- **TRANSACTIONS：如果这部分报告锁等待,您的应用程序可能会锁争用。输出还可以帮助跟踪事务死锁的原因。**
+
+- FILE I/O：本节提供有关InnoDB用于执行各种I / O的线程的信息 。其中的前几个专用于常规 InnoDB处理。内容还显示有关挂起的I / O操作的信息和有关I / O性能的统计信息。
+  这些线程的数量由innodb_read_io_threads和 innodb_write_io_threads 参数控制 。
+
+  1. insert buffer thread
+  2. log thread
+  3. read thread
+  4. write thread
+
+- INSERT BUFFER AND ADAPTIVE HASH INDEX：本节显示了 InnoDB插入缓冲区（也称为更改缓冲区）和自适应哈希索引的状态。
+
+  - Ibuf：
+    1. seg size：当前Insert Buffer大小，205 x 16KB
+    2. free list len： 空闲列表长度
+    3. size ：已经合并页的数量
+
+  - merged operations：
+    1. insert：Insert Buffer
+    2. delete mark：Delete Buffer
+    3. delete：purge Buffer
+
+  - discarded operations：表示Change Buffer发生改变时，表已被删除，因此无需将记录合并到辅助索引
+
+- **LOG：本部分显示有关InnoDB日志的信息 。内容包括当前日志序号，已将日志刷新到磁盘的“距离”以及InnoDB上次执行检查点的位置 。**（请参见 第14.12.3节“ InnoDB检查点”。）本节还显示有关挂起写入和写入性能统计信息。
+
+- BUFFER POOL AND MEMORY：本节为您提供有关已读和已写页面的统计信息。您可以从这些数字中计算出查询当前正在执行多少个数据文件I / O操作。
+
+  - buffer pool size：512（缓冲池大小）512代表512个页，大小为512 * 16KB
+  - Free buffers： 370（Free list大小）
+  - Database pages：138（LRU list大小）可以看到Free list + LRU list 不等于 缓冲池大小，因为缓冲池中还有其他区域需要占用页
+  - Modified db pages：0 （Flush list大小）
+  - Pages made young：LRU列表中数据页移动到前端的次数
+  - **Buffer pool hit rate：缓冲池的命中率**
+  - LRU len: 138：LRU列表页数量
+  - unzip_LRU len: 0：压缩页数量
+    注意：LRU包含了unzip_LRU的数量
+
+- ROW OPERATIONS：本节显示了主线程在做什么，包括每种行操作的数量和性能比率。
+
+**第二种方式：infomation_schema库下**
+
+- INNODB_BUFFER_POOL_STATS：缓冲池状态，包含LRU list、Free list、Flush list大小，频率、缓冲命中率等
+- INNODB_BUFFER_PAGE_LRU：查看LRU列表中每个页的具体信息
+- INNODB_BUFFER_PAGE    
+
+---
 
 ## 7.聊一下伙伴内存分配系统——未完
 
