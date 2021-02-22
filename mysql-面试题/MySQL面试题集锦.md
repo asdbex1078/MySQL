@@ -1148,7 +1148,13 @@ union all 语句的执行计划如下：
 
 ---
 
-## 10.一些有趣的问题
+## 10.alter table 语句的本质是什么？怎么快速给一个大表加一个列？
+
+[参考这里](https://blog.csdn.net/qq_34275277/article/details/111684122)
+
+---
+
+## 11.一些有趣的问题
 
 ### (1) select sid from sc where score < 60 group by sid;  与 select distinct sid from sc where score < 60; 相比性能如何？
 
@@ -1479,6 +1485,10 @@ Change Buffer中的 Insert Buffer，针对非唯一索引做出的优化，随�
 
 ## 6. 分布式事务解决方案？——未完
 
+TCC
+
+门面模式
+
 ---
 
 # （七）日志类问题
@@ -1806,7 +1816,10 @@ END OF INNODB MONITOR OUTPUT
 ## 1. 怎么优化MySQL？——未完待续
 
 1. 硬件级别：
-   	**CPU、磁盘IO读写速度、服务器内存大小、带宽都是影响MySQL效率的因素。其中最重要的是CPU、IO、内存大小。**
+   	- **CPU、磁盘IO读写速度、服务器内存大小、带宽都是影响MySQL效率的因素。其中最重要的是CPU、IO、内存大小。**
+      	- 尽量采用SSD固态硬盘
+       - 加大服务器内存，采用高端的CPU
+       - 磁盘RAID架构下，锂电池的定时充放电会引起数据库性能抖动
 2. 选择合适的存储引擎
    - MYISAM：使用于读多写少，甚至不需要写的情况
    - InnoDB：主流储存引擎，默认存储引擎。
@@ -1828,6 +1841,9 @@ END OF INNODB MONITOR OUTPUT
 6. 锁机制
    - 索引不仅用于快速查询，也用来避免不必要的加锁，不合适的sql不加索引会锁全表数据
    - 尽量按顺序编写sql，避免死锁，避免锁等待
+7. 主从复制
+8. 分库分表
+9. 故障转移
 
 
 
